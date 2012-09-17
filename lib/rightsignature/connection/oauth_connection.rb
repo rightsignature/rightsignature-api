@@ -1,33 +1,28 @@
 module RightSignature
   class OauthConnection
-    include HTTParty
-    base_uri 'https://rightsignature.com/api'
-    format :xml
 
     class << self
-      def oauth_client
-        @oauth_client ||= OAuth::Consumer.new(
+      def oauth_consumer
+        @oauth_consumer ||= OAuth::Consumer.new(
           RightSignature::configuration[:consumer_key],
           RightSignature::configuration[:consumer_secret],
           {
-           :site => RightSignature::configuration[:url],
-           :authorize_path=>'/oauth/authorize', 
-           :access_token_path=>'/oauth/access_token', 
+           :site              => "https://rightsignature.com",
+           :scheme            => :header,
+           :http_method        => :post,
+           :authorize_path    =>'/oauth/authorize', 
+           :access_token_path =>'/oauth/access_token', 
            :request_token_path=>'/oauth/request_token'
           }
         )
       end
       
       def access_token
-        @access_token ||= OAuth::AccessToken.new(self.oauth_client,  RightSignature::configuration[:access_token],  RightSignature::configuration[:access_secret])
+        @access_token ||= OAuth::AccessToken.new(oauth_consumer,  RightSignature::configuration[:access_token],  RightSignature::configuration[:access_secret])
       end
       
-      def get(path, options={})
-        self.access_token.get(path, options)
-      end
-
-      def post(path, options={})
-        self.access_token.post(path, options)
+      def request(method, path, headers={})
+        self.access_token.__send__(method, path, headers)
       end
     end
 

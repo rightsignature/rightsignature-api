@@ -1,10 +1,13 @@
 require 'httparty'
 require 'gyoku'
+require 'oauth'
 require 'rightsignature/document'
 require 'rightsignature/template'
 require 'rightsignature/connection/oauth_connection'
 require 'rightsignature/connection/token_connection'
 require 'rightsignature/connection'
+
+Gyoku.convert_symbols_to :none
 
 module RightSignature
   class <<self

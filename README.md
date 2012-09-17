@@ -20,21 +20,21 @@ Custom API calls using RightSignature::Connection
 
 In case there are new API paths, RightSignature::Connection allows a specific path to be specified.
 Ex. GET https://rightsignature.com/api/documents
-RightSignature::Connection.get('/documents', {:my => 'params'}, {'custom_header' => 'headerValue'})
+RightSignature::Connection.get('/api/documents', {:my => 'params'}, {'custom_header' => 'headerValue'})
 
-Ex. POST /documents
+Ex. POST https://rightsignature.com/api/documents
 request_hash= {
   :document => {
     :subject => "Your Form", 
     'document_data' => {:type => 'url', :value => 'http://localhost:3000/sub.pdf' }
   }
 }
-RightSignature::Connection.post('/documents', request_hash, {'custom_header' => 'headerValue'})
+RightSignature::Connection.post('/api/documents', request_hash, {'custom_header' => 'headerValue'})
 
 
 TODO:
 -----
-Hook up OAuth Authentication 
+Clean up OAuthConnection class
 Flush out Template class
 Add methods for Document redirect and simpler sending, reduce need of making a hash
 Add specs for Document

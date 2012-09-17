@@ -8,10 +8,10 @@ module RightSignature
           options = {}
           options[:headers] = headers
           options[:query] = params
-          RightSignature::TokenConnection.request(:get, url, options)
+          RightSignature::TokenConnection.request(:get, url, options).parsed_response
         else
           unless params.empty?
-            url = "#{url}?#{params.map{|k,v| URI.escape("#{k}=#{v}")}.join('&')}"
+            url = "#{url}?#{params.sort.map{|param| URI.escape("#{param[0]}=#{param[1]}")}.join('&')}"
           end
           res = RightSignature::OauthConnection.request(:get, url, headers)
           MultiXml.parse(res.body)
