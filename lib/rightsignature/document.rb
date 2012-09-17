@@ -1,34 +1,28 @@
 module RightSignature
   class Document
     class << self
-      def list(options)
-        res = RightSignature::Connection.get "/documents.xml"
-        res.parsed_response
+      def list(options={})
+        RightSignature::Connection.get "/api/documents.xml"
       end
       
       def details(guid)
-        res = RightSignature::Connection.get "/documents/#{guid}.xml"
-        res.parsed_response
+        RightSignature::Connection.get "/api/documents/#{guid}.xml"
       end
       
       def batch_details(guids)
-        res = RightSignature::Connection.get "/documents/#{guids.join(',')}/batch_details.xml"
-        res.parsed_response
+        RightSignature::Connection.get "/api/documents/#{guids.join(',')}/batch_details.xml"
       end
       
       def resend_reminder(guid)
-        res = RightSignature::Connection.post "/documents/#{guid}/send_reminders.xml", {}
-        res.parsed_response
+        RightSignature::Connection.post "/api/documents/#{guid}/send_reminders.xml", {}
       end
       
       def trash(guid)
-        res = RightSignature::Connection.post "/documents/#{guid}/trash.xml", {}
-        res.parsed_response
+        RightSignature::Connection.post "/api/documents/#{guid}/trash.xml", {}
       end
 
       def extend_expiration(guid)
-        res = RightSignature::Connection.post "/documents/#{guid}/extend_expiration.xml", {}
-        res.parsed_response
+        RightSignature::Connection.post "/api/documents/#{guid}/extend_expiration.xml", {}
       end
       
       # This will REPLACE the tags on a document
@@ -36,12 +30,10 @@ module RightSignature
       # Hash style:
       # {:name => value}
       def update_tags(guid, tags)
-        res = RightSignature::Connection.post "/documents/#{guid}/update_tags.xml", { :tags => tags.map{|t| {:tag => t}} }
-        res.parsed_response
+        RightSignature::Connection.post "/api/documents/#{guid}/update_tags.xml", { :tags => tags.map{|t| {:tag => t}} }
       end
       
       # Creates a document from a base64 encoded file or publicly available URL
-      # Use strings for hash keys with underscores because Gyoku camelcases underscored keys
       # Ex. of document_hash
       # {
       #   :document => {
@@ -60,8 +52,7 @@ module RightSignature
       #   }
       # }
       def send(document_hash)
-        res = RightSignature::Connection.post "/documents.xml", document_hash
-        res.parsed_response
+        RightSignature::Connection.post "/api/documents.xml", document_hash
       end
       
     end
