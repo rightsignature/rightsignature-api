@@ -1,7 +1,7 @@
 module RightSignature
   class TokenConnection
     include HTTParty
-    base_uri 'https://rightsignature.com/api'
+    base_uri 'https://rightsignature.com'
     format :xml
 
     class <<self

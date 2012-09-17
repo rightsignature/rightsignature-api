@@ -5,19 +5,19 @@ describe RightSignature::Connection do
     describe "connection method" do
       it "should default to RightSignature::OauthConnection if no api_token was specified" do
         RightSignature::configuration = {:consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_token => "AccessToken098", :access_secret => "AccessSecret123"}
-        RightSignature::OauthConnection.should_receive(:request)
+        RightSignature::OauthConnection.should_receive(:request).and_return(stub('Response', :body => ''))
         RightSignature::Connection.get("/path")
       end
 
       it "should use RightSignature::TokenConnection if api_token was specified" do
         RightSignature::configuration = {:api_token => "APITOKEN", :consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_token => "AccessToken098", :access_secret => "AccessSecret123"}
-        RightSignature::TokenConnection.should_receive(:request)
+        RightSignature::TokenConnection.should_receive(:request).and_return(stub('Response', :parsed_response => {}))
         RightSignature::Connection.get("/path")
       end
 
       it "should use RightSignature::TokenConnection if only api_token was specified" do
         RightSignature::configuration = {:api_token => "APITOKEN"}
-        RightSignature::TokenConnection.should_receive(:request)
+        RightSignature::TokenConnection.should_receive(:request).and_return(stub('Response', :parsed_response => {}))
         RightSignature::Connection.get("/path")
       end
     end
@@ -32,19 +32,19 @@ describe RightSignature::Connection do
     describe "connection method" do
       it "should default to RightSignature::OauthConnection if no api_token was specified" do
         RightSignature::configuration = {:consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_token => "AccessToken098", :access_secret => "AccessSecret123"}
-        RightSignature::OauthConnection.should_receive(:request)
+        RightSignature::OauthConnection.should_receive(:request).and_return(stub('Response', :body => ''))
         RightSignature::Connection.post("/path")
       end
 
       it "should default to RightSignature::TokenConnection if api_token was specified" do
         RightSignature::configuration = {:api_token => "APITOKEN", :consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_token => "AccessToken098", :access_secret => "AccessSecret123"}
-        RightSignature::TokenConnection.should_receive(:request)
+        RightSignature::TokenConnection.should_receive(:request).and_return(stub('Response', :parsed_response => {}))
         RightSignature::Connection.post("/path")
       end
 
       it "should default to RightSignature::TokenConnection if only api_token was specified" do
         RightSignature::configuration = {:api_token => "APITOKEN"}
-        RightSignature::TokenConnection.should_receive(:request)
+        RightSignature::TokenConnection.should_receive(:request).and_return(stub('Response', :parsed_response => {}))
         RightSignature::Connection.post("/path")
       end
 
