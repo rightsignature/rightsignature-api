@@ -51,7 +51,7 @@ module RightSignature
       #     'use_text_tags' => false
       #   }
       # }
-      def send(document_hash)
+      def send_document(document_hash)
         RightSignature::Connection.post "/api/documents.xml", document_hash
       end
       
