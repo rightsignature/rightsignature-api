@@ -1,6 +1,7 @@
 require 'httparty'
 require 'gyoku'
 require 'oauth'
+require 'rightsignature/errors'
 require 'rightsignature/document'
 require 'rightsignature/template'
 require 'rightsignature/connection/oauth_connection'
@@ -57,5 +58,4 @@ module RightSignature
       [:api_token].freeze
     end
   end
-
 end

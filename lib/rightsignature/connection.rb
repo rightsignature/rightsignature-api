@@ -1,6 +1,14 @@
 module RightSignature
   class Connection
     class << self
+      def site
+        if RightSignature::has_api_token?
+          RightSignature::TokenConnection.base_uri
+        else
+          RightSignature::OauthConnection.oauth_consumer.site
+        end
+      end
+      
       def get(url, params={}, headers={})
         RightSignature::check_credentials
         
@@ -25,9 +33,16 @@ module RightSignature
           options = {}
           options[:headers] = headers
           options[:body] = Gyoku.xml(body)
-          RightSignature::TokenConnection.request(:post, url, options).parsed_response
+          res = RightSignature::TokenConnection.request(:post, url, options)
+
+          raise RightSignature::ResponseError.new(res) unless res.success?
+
+          res.parsed_response
         else
           res = RightSignature::OauthConnection.request(:post, url, Gyoku.xml(body), headers)
+
+          raise RightSignature::ResponseError.new(res) unless res.is_a? Net::HTTPSuccess
+
           MultiXml.parse(res.body)
         end
       end
