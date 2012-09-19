@@ -24,12 +24,114 @@ Documents
 ---------
 API calls involving documents are wrapped in the RightSignature::Document class.
 
+#####Listing Document
+For showing all documents
+```
+RightSignature::Document.list
+```
+
+For showing page 1 of completed and trashed documents, with 20 per page, matching search term 'me', with tag "single_tag" and tag "key" with value of "with_value"
+```
+options = {
+  :state => ['completed', 'trashed'],
+  :page => 1,
+  :per_page => 20,
+  :search => "me",
+  :tags => ["single_tag", "key" => "with_value"]
+}
+RightSignature::Document.list(options)
+```
+Optional Options:
+ * page: page number
+ * per_page: number of documents to return per page. 
+     API only supports 10, 20, 30, 40, or 50. Default is 10.
+ * tags: filter documents with given tags. Tags are an array of strings (single tag) and hashes (tag_name => tag_value).
+     Ex. ["single_tag",{"tag_key" => "tag_value"}] would filter documents with 'single_tag' and the name/value of 'tag_key' with value 'tag_value'.
+ * search: filter documents with given term.
+ * state: An array of document states to filter documents by. 
+     API supports 'pending', 'completed', 'trash', and 'pending'.
+ * sort: sort documents by given attribute. 
+     API supports 'created', 'completed', and 'activity'
+ * range: return documents with a certain date range.
+     API only supports 'today', 'thisweek', 'thismonth', 'alltime', or a Date
+ * recipient_email: filter document where it has a recipient with given email and involves the current OAuth user. 
+ * account: include all documents in current account if true. Should be true or false
+    Only available for account admins and owners.
+
+#####Document Details
+```
+RightSignature::Document.details(guid)
+```
+
+#####Document Details for Multiple documents
+```
+RightSignature::Document.batch_details(guids)
+```
+ * guids: Array of document GUIDs
+
+#####Send Reminder
+```
+RightSignature::Document.resend_reminder(guid)
+```
+
+#####Trash Document
+```
+RightSignature::Document.trash(guid)
+```
+
+#####Extend Expiration of Document by 7 days
+```
+RightSignature::Document.extend_expiration(guid)
+```
+
+#####Replace Tags on Document
+```
+tags=[{:tag => {:name => 'sent_from_api'}}, {:tag => {:name => 'user_id', :value => '12345'}}]
+RightSignature::Document.update_tags(guid, tags)
+```
+ * guid
+ * tags: An array of {:name => 'tag_name'} or {:name => 'tag_name', :value => 'value'}
+
+
+#####Create New Document
+```
+document_hash={
+  :document => {
+    :subject => 'My Subject',
+    'document_data' => {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"},
+    'recipients' => [
+      {:recipient => {:name => "RightSignature", :email => "support@rightsignature.com", :role => 'cc'}},
+      {:recipient => {:name => "John Bellingham", :email => "john@rightsignature.com", :role => 'signer'}},
+      {:recipient => {'is_sender' => true, :role => 'signer'}},
+    ],
+    :tags => [{:tag => {:name => 'sent_from_api'}}, {:tag => {:name => 'user_id', :value => '12345'}}],
+    :expires_in => '5 days',
+    :action => "redirect",
+    'callback_location' => "http://example.com/doc_callback",
+    'use_text_tags' => false
+  }
+}
+
+RightSignature::Document.send_document(document_hash)
+```
+  * document_hash: Hash version of the request XML
 
 
 Templates
 ---------
 API calls involving documents are wrapped in the RightSignature::Template class.
 
+#####Listing Document
+```
+RightSignature::Template.list(options={})
+```
+Optional Options:
+ * page: page number
+ * per_page: number of documents to return per page. 
+     API only supports 10, 20, 30, 40, or 50. Default is 10.
+ * tags: filter documents with given tags. Tags are an array of strings, name and value in a name/value tag should be separated by colon (:).
+     Ex. ["single_tag","tag_key:tag_value"] would filter documents with 'single_tag' and the name/value of 'tag_key' with value 'tag_value'.
+ * search: filter documents with given term.
 
 
 
@@ -37,12 +139,12 @@ Custom API calls using RightSignature::Connection
 -------------------------------------------------
 
 In case there are new API paths, RightSignature::Connection allows a specific path to be specified.
-#####Ex. GET https://rightsignature.com/api/documents
+#####Ex. GET https://rightsignature.com/api/documents.xml
 ```
-RightSignature::Connection.get('/api/documents', {:my => 'params'}, {'custom_header' => 'headerValue'})
+RightSignature::Connection.get('/api/documents.xml', {:my => 'params'}, {'custom_header' => 'headerValue'})
 ```
 
-#####Ex. POST https://rightsignature.com/api/documents
+#####Ex. POST https://rightsignature.com/api/documents.xml
 ```
 request_hash= {
   :document => {
@@ -50,7 +152,14 @@ request_hash= {
     'document_data' => {:type => 'url', :value => 'http://localhost:3000/sub.pdf' }
   }
 }
-RightSignature::Connection.post('/api/documents', request_hash, {'custom_header' => 'headerValue'})
+RightSignature::Connection.post('/api/documents.xml', request_hash, {'custom_header' => 'headerValue'})
+```
+
+Development Notes
+-----------------
+To load in irb from project root:
+```
+$:.push File.expand_path("../lib", __FILE__); require "rightsignature"; RightSignature::load_configuration(MY_KEYS)
 ```
 
 TODO:

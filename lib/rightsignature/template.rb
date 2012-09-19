@@ -1,6 +1,8 @@
 module RightSignature
   class Template
     class << self
+      include RightSignature::Helpers::Tags
+      
       # List Templates and passes in optional options.
       #  Options:
       #   * page: page number
@@ -10,12 +12,7 @@ module RightSignature
       #       Ex. "single_tag,tag_key:tag_value" would find templates with 'single_tag' and the name/value of 'tag_key' with value 'tag_value'.
       #   * search: term to search for in templates.
       def list(options={})
-        if options[:tags] && options[:tags].is_a?(Array)
-          options[:tags].each_with_index do |tag, idx|
-            options[:tags][idx] = tag.first.join(':') if tag.is_a? Hash
-          end
-          options[:tags] = options[:tags].join(',')
-        end
+        options[:tags] = mixed_array_to_string_array(options[:tags]) if options[:tags]
         RightSignature::Connection.get "/api/templates.xml", options
       end
       

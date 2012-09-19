@@ -1,8 +1,12 @@
 module RightSignature
   class Document
     class << self
+      include RightSignature::Helpers::Tags
+      
       def list(options={})
-        RightSignature::Connection.get "/api/documents.xml"
+        options[:tags] = mixed_array_to_string_array(options[:tags]) if options[:tags]
+        options[:state] = options[:state].join(',') if options[:state] && options[:state].is_a?(Array)
+        RightSignature::Connection.get "/api/documents.xml", options
       end
       
       def details(guid)
@@ -13,7 +17,7 @@ module RightSignature
         RightSignature::Connection.get "/api/documents/#{guids.join(',')}/batch_details.xml"
       end
       
-      def resend_reminder(guid)
+      def send_reminder(guid)
         RightSignature::Connection.post "/api/documents/#{guid}/send_reminders.xml", {}
       end
       
@@ -30,7 +34,7 @@ module RightSignature
       # Hash style:
       # {:name => value}
       def update_tags(guid, tags)
-        RightSignature::Connection.post "/api/documents/#{guid}/update_tags.xml", { :tags => tags.map{|t| {:tag => t}} }
+        RightSignature::Connection.post "/api/documents/#{guid}/update_tags.xml", { :tags => array_to_xml_hash(tags) }
       end
       
       # Creates a document from a base64 encoded file or publicly available URL
