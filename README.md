@@ -90,7 +90,7 @@ tags=[{:tag => {:name => 'sent_from_api'}}, {:tag => {:name => 'user_id', :value
 RightSignature::Document.update_tags(guid, tags)
 ```
  * guid
- * tags: An array of {:name => 'tag_name'} or {:name => 'tag_name', :value => 'value'}
+ * tags: An array of 'tag_name' or {'tag_name' => 'value'}
 
 
 #####Create New Document
