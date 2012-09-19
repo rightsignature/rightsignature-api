@@ -121,7 +121,7 @@ Templates
 ---------
 API calls involving documents are wrapped in the RightSignature::Template class.
 
-#####Listing Document
+#####Listing Templates
 ```
 RightSignature::Template.list(options={})
 ```
@@ -133,6 +133,116 @@ Optional Options:
      Ex. ["single_tag","tag_key:tag_value"] would filter documents with 'single_tag' and the name/value of 'tag_key' with value 'tag_value'.
  * search: filter documents with given term.
 
+#####Template Details
+```
+RightSignature::Template.details(guid)
+```
+
+#####Template Prepacking
+For cloning a Template before sending it.
+```
+RightSignature::Template.prepackage(guid)
+```
+
+#####Template Prefilling
+After prepacking, the new template can be updated with prefill data. This won't send out the template as a document.
+```
+RightSignature::Template.prefill(guid, subject, roles)
+```
+
+Optional options:
+ * description: document description that'll appear in the email
+ * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+     Ex. [{"Salary" => "$1,000,000"}]
+ * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
+ * tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
+     Ex. ['sent_from_api', {"user_id" => "32"}]
+ * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+     Ex. "http://yoursite/callback"
+```
+options = {
+  :description => "Please read over the handbook and sign it.",
+  :merge_fields => [
+    { "Department" => "Fun and games" },
+    { "Salary" => "$1,000,000" }
+  ],
+  :expires_in => 5,
+  :tags => [
+    {:name => 'sent_from_api'},
+    {:name => 'user_id', :value => '32'}
+  ],
+  :callback_url => "http://yoursite/callback"
+}
+RightSignature::Template.prefill(guid, subject, roles, options)
+```
+
+
+#####Template Sending
+Send template as a document for signing. Same options as prefill.
+```
+RightSignature::Template.send_template(guid, subject, roles)
+```
+
+Optional options:
+ * description: document description that'll appear in the email
+ * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+     Ex. [{"Salary" => "$1,000,000"}]
+ * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
+ * tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
+     Ex. ['sent_from_api', {"user_id" => "32"}]
+ * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+     Ex. "http://yoursite/callback"
+```
+options = {
+  :description => "Please read over the handbook and sign it.",
+  :merge_fields => [
+    { "Department" => "Fun and games" },
+    { "Salary" => "$1,000,000" }
+  ],
+  :expires_in => 5,
+  :tags => [
+    {:name => 'sent_from_api'},
+    {:name => 'user_id', :value => '32'}
+  ],
+  :callback_url => "http://yoursite/callback"
+}
+RightSignature::Template.send_template(guid, subject, roles, options)
+```
+
+#####Create New Template Link
+Generate a url that let's someone upload and create a template under OAuth user's account.
+```
+RightSignature::Template.generate_build_url
+```
+
+You can also add restrictions to what the person can do:
+ * callback_location: URI encoded URL that specifies the location we will POST a callback notification to when the template has been created.
+ * redirect_location: A URI encoded URL that specifies the location we will redirect the user to, after they have created a template.
+ * tags: tags to add to the template. an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
+     Ex. [{:name => 'created_from_api'}, {:name => "user_id", :value => "123"}]
+ * acceptabled_role_names: The user creating the Template will be forced to select one of the values provided. 
+     There will be no free-form name entry when adding roles to the Template. An array of strings. 
+     Ex. ["Employee", "Employeer"]
+ * acceptable_merge_field_names: The user creating the Template will be forced to select one of the values provided. 
+     There will be no free-form name entry when adding merge fields to the Template.
+     Ex. ["Location", "Tax ID", "Company Name"]
+```
+options = {
+  :acceptable_merge_field_names => 
+    [
+      {:name => "Site ID"}, 
+      {:name => "Starting City"}
+    ],
+  :acceptabled_role_names => 
+    [
+      {:name => "Http Monster"}, 
+      {:name => "Party Monster"}
+    ],
+  :callback_location => "http://example.com/done_signing", 
+  :redirect_location => "http://example.com/come_back_here"
+}
+RightSignature::Template.generate_build_url(options)
+```
 
 
 Custom API calls using RightSignature::Connection
@@ -164,9 +274,7 @@ $:.push File.expand_path("../lib", __FILE__); require "rightsignature"; RightSig
 
 TODO:
 -----
-* Clean up OAuthConnection class
-* Flush out Template class
+* Make a prepackage and send a template method.
 * Add methods for Document redirect and simpler sending, reduce need of making a hash
-* Add specs for Document
 * Gemify me
 * Have a way for to generate an OAuth Access Token from RightSignature
