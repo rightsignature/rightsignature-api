@@ -21,8 +21,12 @@ module RightSignature
         @access_token ||= OAuth::AccessToken.new(oauth_consumer,  RightSignature::configuration[:access_token],  RightSignature::configuration[:access_secret])
       end
       
-      def request(method, path, headers={})
-        self.access_token.__send__(method, path, headers)
+      def request(method, *options)
+        options.last ||= {}
+        options.last["Accept"] ||= "*/*"
+        options.last["content-type"] ||= "application/xml"
+
+        self.access_token.__send__(method, *options)
       end
     end
 

@@ -26,11 +26,16 @@ describe RightSignature::OauthConnection do
   end
 
   describe "request" do
-    it "should create GET request with access token and path with custom headers" do
+    it "should create GET request with access token and path with custom headers as 3rd argument" do
       @access_token_mock.should_receive(:get).with('path', {"User-Agent" => 'My own'})
-      OAuth::AccessToken.stub(:new).and_return(@access_token_mock)
-
+      RightSignature::OauthConnection.stub(:access_token).and_return(@access_token_mock)
       RightSignature::OauthConnection.request(:get, "path", {"User-Agent" => 'My own'})
+    end
+
+    it "should create POST request with access token and path with body as 3rd argument and custom headers as 4th argument" do
+      @access_token_mock.should_receive(:post).with('path', "<template></template>", {"User-Agent" => 'My own'})
+      RightSignature::OauthConnection.stub(:access_token).and_return(@access_token_mock)
+      RightSignature::OauthConnection.request(:post, "path", "<template></template>", {"User-Agent" => 'My own'})
     end
   end
 
