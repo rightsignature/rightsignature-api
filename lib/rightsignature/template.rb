@@ -6,10 +6,16 @@ module RightSignature
       #   * page: page number
       #   * per_page: number of templates to return per page. 
       #       API only supports 10, 20, 30, 40, or 50. Default is 10.
-      #   * tags: templates with specified tags. Tags are comma (,) seperated, name and value in a name/value tag should be seperated by colon (:).
+      #   * tags: filter templates by given tags. Array of strings, for name/value tags colon (:) should separate name and value.
       #       Ex. "single_tag,tag_key:tag_value" would find templates with 'single_tag' and the name/value of 'tag_key' with value 'tag_value'.
       #   * search: term to search for in templates.
       def list(options={})
+        if options[:tags] && options[:tags].is_a?(Array)
+          options[:tags].each_with_index do |tag, idx|
+            options[:tags][idx] = tag.first.join(':') if tag.is_a? Hash
+          end
+          options[:tags] = options[:tags].join(',')
+        end
         RightSignature::Connection.get "/api/templates.xml", options
       end
       
@@ -17,11 +23,12 @@ module RightSignature
         RightSignature::Connection.get "/api/templates/#{guid}.xml", {}
       end
       
+      # Clones a template so it can be used for sending. Always first step in sending a template.
       def prepackage(guid)
         RightSignature::Connection.post "/api/templates/#{guid}/prepackage.xml", {}
       end
       
-      # Prefills template
+      # Prefills template.
       # * guid: templates guid. Ex. a_1_zcfdidf8fi23
       # * subject: subject of the document that'll appear in email
       # * roles: Recipients of the document, should be an array of role names and emails in a hash with keys as role_names. 
@@ -40,8 +47,8 @@ module RightSignature
       #             <value>$1,000,000</value>
       #             </merge_field>
       #     - expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
-      #     - tags: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
-      #         Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
+      #     - tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
+      #         Ex. ['sent_from_api', {"user_id" => "32"}]
       #     - callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
       #         Ex. "http://yoursite/callback"
       # 
@@ -82,15 +89,9 @@ module RightSignature
         # Optional arguments
         if options[:merge_fields]
           merge_fields = []
-          options[:merge_fields].each do |name, value|
-            merge_field << {
-              :merge_field => {
-                :value => value, 
-                :attributes! => {
-                  :merge_field => {"merge_field_name" => name}
-                }
-              }
-            }
+          options[:merge_fields].each do |merge_field_hash|
+            name, value = merge_field_hash.first
+            merge_fields << { "merge_field merge_field_name=\'#{name}\'" => {:value => value}}
           end
           xml_hash[:template][:merge_fields] = merge_fields
         end
@@ -98,7 +99,12 @@ module RightSignature
         if options[:tags]
           xml_hash[:template][:tags] = []
           options[:tags].each do |tag|
-            xml_hash[:template][:tags] << {:tag => tag}
+            if tag.is_a? Hash
+              name,value = tag.first
+              xml_hash[:template][:tags] << {:tag => {:name => name, :value => value}}
+            elsif tag.is_a? String
+              xml_hash[:template][:tags] << {:tag => {:name => tag}}
+            end
           end
         end
         
@@ -110,7 +116,7 @@ module RightSignature
       end
       
       
-      # Sends template
+      # Sends template.
       # * guid: templates guid. Ex. a_1_zcfdidf8fi23
       # * subject: subject of the document that'll appear in email
       # * roles: Recipients of the document, should be an array of role names and emails in a hash with keys as role_names. 
@@ -156,7 +162,7 @@ module RightSignature
         prefill(guid, subject, roles, options.merge({:action => 'send'}))
       end
       
-      # Creates a URL that give person ability to create a template in your account
+      # Creates a URL that give person ability to create a template in your account.
       # * options: optional options for redirected person
       #     - callback_location: URI encoded URL that specifies the location we will POST a callback notification to when the template has been created.
       #     - redirect_location: A URI encoded URL that specifies the location we will redirect the user to, after they have created a template.
@@ -188,10 +194,14 @@ module RightSignature
         end
         
         [:callback_location, :redirect_location].each do |other_option|
-          xml_hash[:template][other_option] << other_option
+          xml_hash[:template][other_option] = options[other_option] if options[other_option]
         end
 
-        RightSignature::Connection.post "/api/templates/generate_build_token.xml", xml_hash
+        response = RightSignature::Connection.post "/api/templates/generate_build_token.xml", xml_hash
+        
+        redirect_token = response["token"]["redirect_token"]
+        
+        "#{RightSignature::Connection.site}/builder/new?rt=#{redirect_token}"
       end
       
     end
