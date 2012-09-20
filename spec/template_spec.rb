@@ -144,6 +144,17 @@ describe RightSignature::Template do
         RightSignature::Template.generate_build_url(:acceptabled_role_names => ["Http Monster", "Party Monster"])
       end
 
+      it "should include normalized :tags in params" do
+        RightSignature::Connection.should_receive(:post).with("/api/templates/generate_build_token.xml", {:template => 
+          {:tags => 
+            [
+              {:tag => {:name => "Site"}}, 
+              {:tag => {:name => "Starting City", :value => "NY"}}
+            ]}
+        }).and_return({"token"=>{"redirect_token" => "REDIRECT_TOKEN"}})
+        RightSignature::Template.generate_build_url(:tags => ["Site", "Starting City" => "NY"])
+      end
+      
       it "should include :callback_location and :redirect_location in params" do
         RightSignature::Connection.should_receive(:post).with("/api/templates/generate_build_token.xml", {:template => {
           :callback_location => "http://example.com/done_signing", 

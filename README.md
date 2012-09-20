@@ -86,11 +86,11 @@ RightSignature::Document.extend_expiration(guid)
 
 #####Replace Tags on Document
 ```
-tags=[{:tag => {:name => 'sent_from_api'}}, {:tag => {:name => 'user_id', :value => '12345'}}]
+tags=['sent_from_api', {'user_id' => '12345'}]
 RightSignature::Document.update_tags(guid, tags)
 ```
  * guid
- * tags: An array of 'tag_name' or {'tag_name' => 'value'}
+ * tags: An array of 'tag_name' or {'tag_name' => 'tag_value'}
 
 
 #####Create New Document
@@ -218,8 +218,8 @@ RightSignature::Template.generate_build_url
 You can also add restrictions to what the person can do:
  * callback_location: URI encoded URL that specifies the location we will POST a callback notification to when the template has been created.
  * redirect_location: A URI encoded URL that specifies the location we will redirect the user to, after they have created a template.
- * tags: tags to add to the template. an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
-     Ex. [{:name => 'created_from_api'}, {:name => "user_id", :value => "123"}]
+ * tags: tags to add to the template. an array of strings (for simple tag) or hashes like {'tag_name' => 'tag_value'} (for tuples pairs)
+     Ex. ['created_from_api', {"user_id" => "123"}]
  * acceptabled_role_names: The user creating the Template will be forced to select one of the values provided. 
      There will be no free-form name entry when adding roles to the Template. An array of strings. 
      Ex. ["Employee", "Employeer"]

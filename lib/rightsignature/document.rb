@@ -1,10 +1,11 @@
 module RightSignature
   class Document
+    extend RightSignature::Helpers
+
     class << self
-      include RightSignature::Helpers::Tags
       
       def list(options={})
-        options[:tags] = mixed_array_to_string_array(options[:tags]) if options[:tags]
+        options[:tags] = TagsHelper.mixed_array_to_string_array(options[:tags]) if options[:tags]
         options[:state] = options[:state].join(',') if options[:state] && options[:state].is_a?(Array)
         RightSignature::Connection.get "/api/documents.xml", options
       end
@@ -30,11 +31,11 @@ module RightSignature
       end
       
       # This will REPLACE the tags on a document
-      # tags are an array of {:name => 'tag_name'} or {:name => 'tag_name', :value => 'value'}
+      # tags are an array of 'tag_name' or {'tag_name' => 'value'}
       # Hash style:
       # {:name => value}
       def update_tags(guid, tags)
-        RightSignature::Connection.post "/api/documents/#{guid}/update_tags.xml", { :tags => array_to_xml_hash(tags) }
+        RightSignature::Connection.post "/api/documents/#{guid}/update_tags.xml", { :tags => TagsHelper.array_to_xml_hash(tags) }
       end
       
       # Creates a document from a base64 encoded file or publicly available URL

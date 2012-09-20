@@ -77,6 +77,13 @@ describe RightSignature::Document do
       })
       RightSignature::Document.update_tags('MYGUID', ["myNewOne", {"should_replace" => "the_old_new"}])
     end
+
+    it "should allow empty tags array" do
+      RightSignature::Connection.should_receive(:post).with('/api/documents/MYGUID/update_tags.xml', {
+        :tags => []
+      })
+      RightSignature::Document.update_tags('MYGUID', [])
+    end
   end
 
   describe "send_document" do

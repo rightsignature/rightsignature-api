@@ -1,7 +1,8 @@
 module RightSignature
   class Template
+    extend RightSignature::Helpers
+
     class << self
-      include RightSignature::Helpers::Tags
       
       # List Templates and passes in optional options.
       #  Options:
@@ -12,7 +13,7 @@ module RightSignature
       #       Ex. "single_tag,tag_key:tag_value" would find templates with 'single_tag' and the name/value of 'tag_key' with value 'tag_value'.
       #   * search: term to search for in templates.
       def list(options={})
-        options[:tags] = mixed_array_to_string_array(options[:tags]) if options[:tags]
+        options[:tags] = TagsHelper.mixed_array_to_string_array(options[:tags]) if options[:tags]
         RightSignature::Connection.get "/api/templates.xml", options
       end
       
@@ -76,35 +77,11 @@ module RightSignature
           }
         }
         
-        roles_hash = []
-        roles.each do |role_hash|
-          name, value = role_hash.first
-          roles_hash << {"role role_name=\'#{name}\'" => value}
-        end
-        xml_hash[:template][:roles] = roles_hash
+        xml_hash[:template][:roles] = RolesHelper.array_to_xml_hash(roles)
         
         # Optional arguments
-        if options[:merge_fields]
-          merge_fields = []
-          options[:merge_fields].each do |merge_field_hash|
-            name, value = merge_field_hash.first
-            merge_fields << { "merge_field merge_field_name=\'#{name}\'" => {:value => value}}
-          end
-          xml_hash[:template][:merge_fields] = merge_fields
-        end
-        
-        if options[:tags]
-          xml_hash[:template][:tags] = []
-          options[:tags].each do |tag|
-            if tag.is_a? Hash
-              name,value = tag.first
-              xml_hash[:template][:tags] << {:tag => {:name => name, :value => value}}
-            elsif tag.is_a? String
-              xml_hash[:template][:tags] << {:tag => {:name => tag}}
-            end
-          end
-        end
-        
+        xml_hash[:template][:merge_fields] = MergeFieldsHelper.array_to_xml_hash(options[:merge_fields]) if options[:merge_fields]        
+        xml_hash[:template][:tags] = TagsHelper.array_to_xml_hash(options[:tags]) if options[:tags]
         [:expires_in, :description, :callback_url, :action].each do |other_option|
           xml_hash[:template][other_option] = options[other_option] if options[other_option]
         end
@@ -163,8 +140,8 @@ module RightSignature
       # * options: optional options for redirected person
       #     - callback_location: URI encoded URL that specifies the location we will POST a callback notification to when the template has been created.
       #     - redirect_location: A URI encoded URL that specifies the location we will redirect the user to, after they have created a template.
-      #     - tags: tags to add to the template. an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
-      #         Ex. [{:name => 'created_from_api'}, {:name => "user_id", :value => "123"}]
+      #     - tags: tags to add to the template. an array of 'tag_name' (for simple tag) or {'tag_name' => 'value'} (for tuples pairs)
+      #         Ex. ['created_from_api', {"user_id" => "123"}]
       #     - acceptabled_role_names: The user creating the Template will be forced to select one of the values provided. 
       #         There will be no free-form name entry when adding roles to the Template. An array of strings. 
       #         Ex. ["Employee", "Employeer"]
@@ -173,21 +150,10 @@ module RightSignature
       #         Ex. ["Location", "Tax ID", "Company Name"]
       def generate_build_url(options={})
         xml_hash = {:template => {}}
-        
-        if options[:tags]
-          xml_hash[:template][:tags] = []
-          options[:tags].each do |tag|
-            xml_hash[:template][:tags] << {:tag => tag}
-          end
-        end
+        xml_hash[:template][:tags] = TagsHelper.array_to_xml_hash(options[:tags]) if options[:tags]
         
         [:acceptable_merge_field_names, :acceptabled_role_names].each do |option|
-          if options[option]
-            xml_hash[:template][option] = []
-            options[option].each do |name|
-              xml_hash[:template][option] << {:name => name}
-            end
-          end
+          xml_hash[:template][option] = array_to_acceptable_names_hash(options[option]) if options[option]
         end
         
         [:callback_location, :redirect_location].each do |other_option|
