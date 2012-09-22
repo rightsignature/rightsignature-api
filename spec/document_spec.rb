@@ -87,6 +87,170 @@ describe RightSignature::Document do
   end
 
   describe "send_document" do
-    it "should POST /api/documents.xml"
+    it "should POST /api/documents.xml with document hash containing given subject, document data, recipients, and action of 'send'" do
+      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+        :document => {
+          :subject => "subby",
+          :document_data => {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"},
+          :recipients => [],
+          :action => "send"
+        }
+      })
+      document_data = {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"}
+      RightSignature::Document.send_document("subby", [], document_data)
+    end
+
+    it "should POST /api/documents.xml should convert recipients into normalized format" do
+      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+        :document => {
+          :subject => "subby",
+          :document_data => {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"},
+          :recipients => [
+            {:recipient => {:name => "Signy Sign", :email => "signy@example.com", :role => "signer"}},
+            {:recipient =>{:name => "Cee Cee", :email => "ccme@example.com", :role => "cc"}}
+          ],
+          :action => "send"
+        }
+      })
+      document_data = {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"}
+      recipients = [{:name => "Signy Sign", :email => "signy@example.com", :role => "signer"}, {:name => "Cee Cee", :email => "ccme@example.com", :role => "cc"}]
+
+      RightSignature::Document.send_document("subby", recipients, document_data)
+    end
+
+    it "should POST /api/documents.xml with options" do
+      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+        :document => {
+          :subject => "subby",
+          :document_data => {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"},
+          :recipients => [
+            {:recipient => {:name => "Signy Sign", :email => "signy@example.com", :role => "signer"}},
+            {:recipient =>{:name => "Cee Cee", :email => "ccme@example.com", :role => "cc"}}
+          ],
+          :action => "send",
+          :description => "My descript",
+          :callback_url => "http://example.com/call"
+        }
+      })
+      document_data = {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"}
+      recipients = [{:name => "Signy Sign", :email => "signy@example.com", :role => "signer"}, {:name => "Cee Cee", :email => "ccme@example.com", :role => "cc"}]
+    
+      options = {
+        :description => "My descript",
+        :callback_url => "http://example.com/call"
+      }
+      RightSignature::Document.send_document("subby", recipients, document_data, options)
+    end
+  end
+  
+  describe "send_document_from_data" do
+    it "should POST /api/documents.xml with document hash containing given subject, Base64 encoded version of document data, recipients, and action of 'send'" do
+      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+        :document => {
+          :subject => "subby",
+          :document_data => {:type => 'base64', :filename => "my fresh upload.pdf", :value => Base64::encode64("THIS IS MY data")},
+          :recipients => [],
+          :action => "send"
+        }
+      })
+      RightSignature::Document.send_document_from_data("THIS IS MY data", "my fresh upload.pdf", "subby", [])
+    end
+
+    it "should POST /api/documents.xml with options" do
+      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+        :document => {
+          :subject => "subby",
+          :action => "send",
+          :document_data => {:type => 'base64', :filename => "uploaded.pdf", :value => Base64::encode64("THIS")},
+          :recipients => [
+            {:recipient => {:name => "Signy Sign", :email => "signy@example.com", :role => "signer"}},
+            {:recipient =>{:name => "Cee Cee", :email => "ccme@example.com", :role => "cc"}}
+          ],
+          :description => "My descript",
+          :callback_url => "http://example.com/call"
+        }
+      })
+
+      recipients = [{:name => "Signy Sign", :email => "signy@example.com", :role => "signer"}, {:name => "Cee Cee", :email => "ccme@example.com", :role => "cc"}]
+      options = {
+        :description => "My descript",
+        :callback_url => "http://example.com/call"
+      }
+      RightSignature::Document.send_document_from_data("THIS", "uploaded.pdf", "subby", recipients, options)
+    end
+  end
+  
+  describe "send_document_from_file" do
+    it "should open File and base64 encode it" do
+      # Probably get a fixture or something here
+      file = File.new(File.dirname(__FILE__) + '/spec_helper.rb')
+      fake_data = "abc"
+      File.should_receive(:read).with(file).and_return(fake_data)
+      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+        :document => {
+          :subject => "subby",
+          :action => "send",
+          :document_data => {:type => 'base64', :filename => "spec_helper.rb", :value => Base64::encode64(fake_data)},
+          :recipients => []
+        }
+      })
+
+      RightSignature::Document.send_document_from_file(file, "subby", [])
+    end
+
+    it "should open path to file and base64 encode it" do
+      file_path = '/tmp/temp.pdf'
+      fake_data = "abc"
+      File.should_receive(:read).with(file_path).and_return(fake_data)
+      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+        :document => {
+          :subject => "subby",
+          :action => "send",
+          :document_data => {:type => 'base64', :filename => "temp.pdf", :value => Base64::encode64(fake_data)},
+          :recipients => []
+        }
+      })
+      RightSignature::Document.send_document_from_file(file_path, "subby", [])
+    end
+
+    it "should POST /api/documents.xml with options" do
+      file_path = '/tmp/temp.pdf'
+      fake_data = "abc"
+      File.should_receive(:read).with(file_path).and_return(fake_data)
+      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+        :document => {
+          :subject => "subby",
+          :action => "send",
+          :document_data => {:type => 'base64', :filename => "temp.pdf", :value => Base64::encode64(fake_data)},
+          :recipients => [
+            {:recipient => {:name => "Signy Sign", :email => "signy@example.com", :role => "signer"}},
+            {:recipient =>{:name => "Cee Cee", :email => "ccme@example.com", :role => "cc"}}
+          ],
+          :description => "My descript",
+          :callback_url => "http://example.com/call"
+        }
+      })
+
+      recipients = [{:name => "Signy Sign", :email => "signy@example.com", :role => "signer"}, {:name => "Cee Cee", :email => "ccme@example.com", :role => "cc"}]
+      options = {
+        :description => "My descript",
+        :callback_url => "http://example.com/call"
+      }
+      RightSignature::Document.send_document_from_file(file_path, "subby", recipients, options)
+    end
+  end
+  
+  describe "generate_document_url" do
+    it "should POST /api/documents.xml with redirect action and return https://rightsignature.com/builder/new?rt=REDIRECT_TOKEN" do
+      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+        :document => {
+          :subject => "subjy",
+          :action => "redirect",
+          :document_data => {},
+          :recipients => [],
+        }
+      }).and_return({"document"=>{"redirect_token" => "REDIRECT_TOKEN"}})
+      RightSignature::Document.generate_document_redirect_url("subjy", [], {}).should == "#{RightSignature::Connection.site}/builder/new?rt=REDIRECT_TOKEN"
+    end
   end
 end

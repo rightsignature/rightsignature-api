@@ -92,29 +92,53 @@ RightSignature::Document.update_tags(guid, tags)
  * guid
  * tags: An array of 'tag_name' or {'tag_name' => 'tag_value'}
 
-
-#####Create New Document
+#####Sending New Documents
+From file:
 ```
-document_hash={
-  :document => {
-    :subject => 'My Subject',
-    'document_data' => {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"},
-    'recipients' => [
-      {:recipient => {:name => "RightSignature", :email => "support@rightsignature.com", :role => 'cc'}},
-      {:recipient => {:name => "John Bellingham", :email => "john@rightsignature.com", :role => 'signer'}},
-      {:recipient => {'is_sender' => true, :role => 'signer'}},
-    ],
-    :tags => [{:tag => {:name => 'sent_from_api'}}, {:tag => {:name => 'user_id', :value => '12345'}}],
-    :expires_in => '5 days',
-    :action => "redirect",
-    'callback_location' => "http://example.com/doc_callback",
-    'use_text_tags' => false
-  }
+recipients = [
+  {:name => "RightSignature", :email => "support@rightsignature.com", :role => 'cc'},
+  {:name => "John Bellingham", :email => "john@rightsignature.com", :role => 'signer'},
+  {'is_sender' => true, :role => 'signer'}
+]
+options={
+  :tags => [{:tag => {:name => 'sent_from_api'}}, {:tag => {:name => 'user_id', :value => '12345'}}],
+  :expires_in => '5 days',
+  :action => "redirect",
+  'callback_location' => "http://example.com/doc_callback",
+  'use_text_tags' => false
 }
 
-RightSignature::Document.send_document(document_hash)
+RightSignature::Document.send_document_from_file("here/is/myfile.pdf", 'My Subject', recipients, options)
 ```
-  * document_hash: Hash version of the request XML
+Or
+```
+RightSignature::Document.send_document_from_file(File.open("here/is/myfile.pdf", 'r'), 'My Subject', recipients)
+```
+* subject: Document subject
+* recipients: Recipients of the document, should be an array of hashes with :name, :email, and :role ('cc' or 'signer'). 
+    An optional :is_sender => true can be used to reference the API User and won't need to supply :name and :email. Ex. {:is_sender => true, :role => "cc"}
+* Optional options:
+    * description: document description that'll appear in the email
+    * action: 'send' or 'redirect'. Redirect will prefill the document and generate a redirect token that can be used on for someone to send document under API user's account.
+    * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
+    * tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
+        Ex. ['sent_from_api', {"user_id" => "32"}]
+    * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+        Ex. "http://yoursite/callback"
+    * use_text_tags: Parse document for special Text Tags. true or false.
+        More info: https://rightsignature.com/apidocs/text_tags
+
+From raw data:
+```
+recipients = [
+  {:name => "RightSignature", :email => "support@rightsignature.com", :role => 'cc'},
+  {:name => "John Bellingham", :email => "john@rightsignature.com", :role => 'signer'},
+  {'is_sender' => true, :role => 'signer'}
+]
+raw_data = File.read("here/is/myfile.pdf")
+filename = "Desired Filename.pdf"
+RightSignature::Document.send_document_from_file(raw_data, filename, 'My Subject', recipients)
+```
 
 
 Templates
