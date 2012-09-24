@@ -162,6 +162,21 @@ Optional Options:
 RightSignature::Template.details(guid)
 ```
 
+#####Prepackage and Send template
+Most common use of API, clones a template and sends it for signature.
+```
+RightSignature::Template.prepackage_and_send(guid, subject, roles)
+```
+Optional options:
+ * description: document description that'll appear in the email
+ * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+     Ex. [{"Salary" => "$1,000,000"}]
+ * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
+ * tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
+     Ex. ['sent_from_api', {"user_id" => "32"}]
+ * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+     Ex. "http://yoursite/callback"
+
 #####Template Prepacking
 For cloning a Template before sending it.
 ```
