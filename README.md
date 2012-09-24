@@ -207,6 +207,7 @@ Optional options:
      Ex. ['sent_from_api', {"user_id" => "32"}]
  * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
      Ex. "http://yoursite/callback"
+
 ```
 options = {
   :description => "Please read over the handbook and sign it.",
@@ -240,6 +241,7 @@ Optional options:
      Ex. ['sent_from_api', {"user_id" => "32"}]
  * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
      Ex. "http://yoursite/callback"
+
 ```
 options = {
   :description => "Please read over the handbook and sign it.",
