@@ -32,16 +32,22 @@ module RightSignature
         if RightSignature::has_api_token?
           options = {}
           options[:headers] = headers
-          options[:body] = Gyoku.xml(body)
+          options[:body] = XmlFu.xml(body)
           res = RightSignature::TokenConnection.request(:post, url, options)
 
-          raise RightSignature::ResponseError.new(res) unless res.success?
+          unless res.success?
+            puts res.body
+            raise RightSignature::ResponseError.new(res)
+          end
 
           res.parsed_response
         else
-          res = RightSignature::OauthConnection.request(:post, url, Gyoku.xml(body), headers)
+          res = RightSignature::OauthConnection.request(:post, url, XmlFu.xml(body), headers)
 
-          raise RightSignature::ResponseError.new(res) unless res.is_a? Net::HTTPSuccess
+          unless res.is_a? Net::HTTPSuccess
+            puts res.body
+            raise RightSignature::ResponseError.new(res)
+          end
 
           MultiXml.parse(res.body)
         end

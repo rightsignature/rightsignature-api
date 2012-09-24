@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency "bundler", ">= 1.0.0"
   s.add_dependency "oauth", "= 0.4.3"
   s.add_dependency "httparty", ">= 0.9.0"
-  s.add_dependency 'gyoku', '>= 0.4.6'
+  s.add_dependency 'xml-fu', '>= 0.1.7'
 
   s.files        = `git ls-files`.split("\n")
   s.executables  = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }

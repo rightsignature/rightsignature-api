@@ -1,5 +1,5 @@
 require 'httparty'
-require 'gyoku'
+require 'xml-fu'
 require 'oauth'
 require 'rightsignature/errors'
 require 'rightsignature/helpers/normalizing'
@@ -9,7 +9,7 @@ require 'rightsignature/connection/oauth_connection'
 require 'rightsignature/connection/token_connection'
 require 'rightsignature/connection'
 
-Gyoku.convert_symbols_to :none
+XmlFu::Node.symbol_conversion_algorithm = :none
 
 module RightSignature
   class <<self

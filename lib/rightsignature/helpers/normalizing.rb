@@ -35,12 +35,13 @@ module RightSignature::Helpers
   module RolesHelper
     class <<self
       # Converts [{"Role Name" => {:name => "John", :email => "email@example.com"}}] to 
-      #   [{"role roles_name=\"Role Name\"" => {:role => {:name => "John", :email => "email@example.com"}} }]
+      #   [{:role => {:name => "John", :email => "email@example.com", "@role_name" => "Role Name"} }]
       def array_to_xml_hash(roles_array)
         roles_hash_array = []
         roles_array.each do |role_hash|
           name, value = role_hash.first
-          roles_hash_array << {"role role_name=\'#{name}\'" => value}
+          raise "Hash '#{role_hash.inspect}' is malformed, should be something like {ROLE_NAME => {:name => \"a\", :email => \"a@a.com\"}}" unless value.is_a? Hash and name.is_a? String
+          roles_hash_array << {:role => value.merge({"@role_name" => name})}
         end
       
         roles_hash_array
@@ -58,7 +59,7 @@ module RightSignature::Helpers
         merge_fields = []
         merge_fields_array.each do |merge_field_hash|
           name, value = merge_field_hash.first
-          merge_fields << { "merge_field merge_field_name=\'#{name}\'" => {:value => value}}
+          merge_fields << { :merge_field => {:value => value, "@merge_field_name" => name}}
         end
 
         merge_fields

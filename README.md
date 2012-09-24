@@ -313,6 +313,5 @@ $:.push File.expand_path("../lib", __FILE__); require "rightsignature"; RightSig
 
 TODO:
 -----
-* Replace Find alternative to gyoku for converting hash to XML with attributes in nodes
 * Gemify me
 * Have a way for to generate an OAuth Access Token from RightSignature
