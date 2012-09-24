@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Alex Chee", "Geoff Ereth", "Cary Dunn"]
   s.email       = ["dev@rightsignature.com"]
-  s.homepage    = "http://github.com/alexchee/rightsignature-api"
+  s.homepage    = "http://github.com/rightsignature/rightsignature-api"
   s.summary     = "API wrapper for RightSignature"
   s.description = "Provides a wrapper for the RightSignature API."
 
