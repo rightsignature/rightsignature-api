@@ -37,6 +37,26 @@ describe RightSignature::Template do
     end
   end
 
+  
+  describe "prepackage_and_send" do
+    it "should POST /api/templates/GUID123/prepackage.xml and POST /api/templates.xml using guid, and subject from prepackage response" do
+      RightSignature::Connection.should_receive(:post).with('/api/templates/GUID123/prepackage.xml', 
+        {}
+      ).and_return({"template" => {
+        "guid" => "a_123985_1z9v8pd654",
+        "subject" => "subject template",
+        "message" => "Default message here"
+      }})
+      RightSignature::Connection.should_receive(:post).with('/api/templates.xml', {:template => {
+          :guid => "a_123985_1z9v8pd654", 
+          :action => "send", 
+          :subject => "sign me", 
+          :roles => []
+        }})
+      RightSignature::Template.prepackage_and_send("GUID123", "sign me", [])
+    end
+  end
+
   describe "prefill/send_template" do
     it "should POST /api/templates.xml with action of 'prefill', MYGUID guid, roles, and \"sign me\" subject in template hash" do
       RightSignature::Connection.should_receive(:post).with('/api/templates.xml', {:template => {:guid => "MYGUID", :action => "prefill", :subject => "sign me", :roles => []}})
