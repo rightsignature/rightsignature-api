@@ -22,7 +22,12 @@ RightSignature::load_configuration(:api_token => YOUR_TOKEN)
 
 #####Using OAuth authentication
 ```
-RightSignature::load_configuration(:consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_token => "AccessToken098", :access_secret => "AccessSecret123")
+RightSignature::load_configuration(
+  :consumer_key => "Consumer123", 
+  :consumer_secret => "Secret098", 
+  :access_token => "AccessToken098", 
+  :access_secret => "AccessSecret123"
+)
 ```
 Note: if the both OAuth credentials and api_token are set, the default action is to use Token Authentication.
 
@@ -276,6 +281,7 @@ You can also add restrictions to what the person can do:
  * acceptable_merge_field_names: The user creating the Template will be forced to select one of the values provided. 
      There will be no free-form name entry when adding merge fields to the Template.
      Ex. ["Location", "Tax ID", "Company Name"]
+
 ```
 options = {
   :acceptable_merge_field_names => 
