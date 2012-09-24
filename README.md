@@ -2,6 +2,15 @@ RightSignature API
 ==================
 This gem is a wrapper to RightSignature's API for both OAuth authentication and Token authentication
 
+#####Install
+```
+gem install rightsignature
+```
+or in your Gemfile
+```
+gem 'rightsignature', '~> 0.1.2'
+```
+
 Setup
 -----
 After getting an API key from RightSignature, you can use the Secure Token or generate an Access Token with the OAuth key and secret using RightSignature::load_configuration.
@@ -313,5 +322,4 @@ $:.push File.expand_path("../lib", __FILE__); require "rightsignature"; RightSig
 
 TODO:
 -----
-* Gemify me
 * Have a way for to generate an OAuth Access Token from RightSignature
