@@ -172,6 +172,72 @@ module RightSignature
         "#{RightSignature::Connection.site}/builder/new?rt=#{redirect_token}"
       end
       
+      # Sends template with all roles as embedded signers and returns an array of hashes with :name and :url for each signer link.
+      # * guid: templates guid. Ex. a_1_zcfdidf8fi23
+      # * roles: Recipients of the document, should be an array of role names in a hash with keys as role_names. 
+      #     Ex. [{"Employee" => {:name => "John Employee"}]
+      #       is equivalent to 
+      #         <role role_name="Employee">
+      #           <name>John Employee</name>
+      #           <email>noemail@rightsignature.com</email>
+      #         </role>
+      # * options: other optional values
+      #     - subject: subject of the document that'll appear in email. Defaults to Template's subject
+      #     - description: document description that'll appear in the email
+      #     - merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+      #         Ex. [{"Salary" => "$1,000,000"}]
+      #           is equivalent to 
+      #             <merge_field merge_field_name="Salary">
+      #             <value>$1,000,000</value>
+      #             </merge_field>
+      #     - expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
+      #     - tags: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
+      #         Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
+      #     - callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+      #         Ex. "http://yoursite/callback"
+      #     - redirect_location: A URI encoded URL that specifies the location for the signing widget to redirect the user to after it is signed. 
+      #         Ex. "http://yoursite/thanks_for_signing"
+      # 
+      # Ex. call with all options used
+      #   RightSignature::Template.prefill(
+      #     "a_1_zcfdidf8fi23", 
+      #     "Your Employee Handbook", 
+      #     [{"employee" => {:name => "John Employee", :email => "john@employee.com"}}],
+      #     {
+      #       :description => "Please read over the handbook and sign it.",
+      #       :merge_fields => [
+      #         { "Department" => "Fun and games" },
+      #         { "Salary" => "$1,000,000" }
+      #       ],
+      #       :expires_in => 5,
+      #       :tags => [
+      #         {:name => 'sent_from_api'},
+      #         {:name => 'user_id', :value => '32'}
+      #       ],
+      #       :callback_url => "http://yoursite/callback"
+      #     })
+      def send_as_embedded_signers(guid, recipients, options={})
+        redirect_location = options.delete(:redirect_location)
+
+        response = prepackage(guid)
+        template = response["template"]
+
+        recipients.each do |role_hash|
+          key, value = role_hash.first
+          if role_hash[key]["email"]
+            role_hash[key]["email"] = "noemail@rightsignature.com"
+          else
+            role_hash[key][:email] = "noemail@rightsignature.com"
+          end
+        end
+        
+        response = send_template(template["guid"], options[:subject] || template["subject"], recipients, options)
+        document_guid = response["document"]["guid"]
+        
+        RightSignature::Document.get_signer_links_for(document_guid, redirect_location)
+      end
+      
+      
     end
   end
 end

@@ -273,6 +273,26 @@ options = {
 RightSignature::Template.send_template(guid, subject, roles, options)
 ```
 
+#####Embedded Signing Links for Sent Template
+Prepackages a template, and sends it out with each recipients marked as a embedded signer (email as noemail@rightsignature.com), then generates embedded signing URLs.
+Returns an array of {:name => "John Bellingham", "url" => "https://rightsignature.com/signatures/embedded?rt=1234"}
+```
+RightSignature::Template.send_as_embedded_signers(guid, recipients, options={})
+```
+ * guid: guid of template to create document with
+ * recipient: recipient names in array of {"Role Name" => {:name => "Your Name"}}
+ * options:
+   * subject: document subject that'll appear in the email
+   * description: document description that'll appear in the email
+   * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+       Ex. [{"Salary" => "$1,000,000"}]
+   * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
+   * tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
+       Ex. ['sent_from_api', {"user_id" => "32"}]
+   * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+       Ex. "http://yoursite/callback"
+   * redirect_location: URL to redirect users after signing.
+
 #####Create New Template Link
 Generate a url that let's someone upload and create a template under OAuth user's account.
 ```
