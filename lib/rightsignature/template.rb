@@ -90,10 +90,10 @@ module RightSignature
         RightSignature::Connection.post "/api/templates.xml", xml_hash
       end
       
-      def prepackage_and_send(guid, subject, roles, options={})
+      def prepackage_and_send(guid, roles, options={})
         response = prepackage(guid)
         new_guid = response["template"]["guid"]
-        send_template(new_guid, subject, roles, options)
+        send_template(new_guid, options.delete(:subject) || response["template"]["subject"], roles, options)
       end
       
       # Sends template.

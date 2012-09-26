@@ -188,9 +188,12 @@ RightSignature::Template.details(guid)
 #####Prepackage and Send template
 Most common use of API, clones a template and sends it for signature.
 ```
-RightSignature::Template.prepackage_and_send(guid, subject, roles)
+RightSignature::Template.prepackage_and_send(guid, roles, options={})
 ```
+ * guid: template guid to use. Should be a template that was prepackaged
+ * roles: recipient names in array of {:name => "Person's Name", :email => "Email"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name", :name => "a@example.com"}}
 Optional options:
+ * subject: document subject. Defaults to the subject in prepackage response.
  * description: document description that'll appear in the email
  * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
      Ex. [{"Salary" => "$1,000,000"}]
