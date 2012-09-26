@@ -8,7 +8,7 @@ gem install rightsignature
 ```
 or in your Gemfile
 ```
-gem 'rightsignature', '~> 0.1.2'
+gem 'rightsignature', '~> 0.1.3'
 ```
 
 Setup
