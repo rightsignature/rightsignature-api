@@ -237,10 +237,8 @@ describe RightSignature::Template do
   end
   
   describe "send_as_self_signers" do
-    it "should prepackage template, send template with reciepents with noemail@rightsignature.com and return self-signer links" do
-      RightSignature::Connection.should_receive(:post).with('/api/templates/TGUID/prepackage.xml', 
-        {}
-      ).and_return(  {"template"=>{
+    before do
+      @prepackage_response = {"template"=>{
         "type"=>"Document",
         "guid"=>"a_123_456",
         "created_at"=>"2012-09-25T14:51:44-07:00",
@@ -280,7 +278,19 @@ describe RightSignature::Template do
         "https%3A%2F%2Fs3.amazonaws.com%3A443%2Frightsignature.com%2Fassets%2F1464%2Fabcde_p1_t.png%3FSignature%3D1234AC",
         "redirect_token"=>
         "123456bcde"
-      }})
+      }}
+      
+      @sent_document_response = {"document"=> {
+        "status"=>"sent", 
+        "guid"=>"ABCDEFGH123"
+      }}
+      
+    end
+    
+    it "should prepackage template, send template with reciepents with noemail@rightsignature.com and return self-signer links" do
+      RightSignature::Connection.should_receive(:post).with('/api/templates/TGUID/prepackage.xml', 
+        {}
+      ).and_return(@prepackage_response)
       RightSignature::Connection.should_receive(:post).with('/api/templates.xml', {:template => {
           :guid => "a_123_456", 
           :action => "send", 
@@ -289,10 +299,7 @@ describe RightSignature::Template do
             {:role => {:name => "John Bellingham", :email => "noemail@rightsignature.com", "@role_name" => "Leasee"}},
             {:role => {:name => "Tim Else", :email => "noemail@rightsignature.com", "@role_name" => "Leaser"}}
           ]
-        }}).and_return({"document"=> {
-          "status"=>"sent", 
-          "guid"=>"ABCDEFGH123"
-        }})
+        }}).and_return(@sent_document_response)
       RightSignature::Connection.should_receive(:get).with("/api/documents/ABCDEFGH123/signer_links.xml", {}).and_return({"document" => {
         "signer_links" => [
           {"signer_link" => {"name" => "John Bellingham", "role" => "signer_A", "signer_token" => "slkfj2"}},
@@ -303,6 +310,35 @@ describe RightSignature::Template do
       
       results = RightSignature::Template.send_as_embedded_signers("TGUID", [
         {"Leasee" => {:name => "John Bellingham"}}, 
+        {"Leaser" => {:name => "Tim Else"}}
+      ])
+      results.size.should == 2
+      results.include?({"name" => "John Bellingham", "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=slkfj2"})
+      results.include?({"name" => "Tim Else", "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=asfd1"})
+    end
+    
+    it "should not overwrite email if one is already set for receipient" do
+      RightSignature::Connection.should_receive(:post).with('/api/templates/TGUID/prepackage.xml', 
+        {}
+      ).and_return(@prepackage_response)
+      RightSignature::Connection.should_receive(:post).with('/api/templates.xml', {:template => {
+          :guid => "a_123_456", 
+          :action => "send", 
+          :subject => "subject template",
+          :roles => [
+            {:role => {:name => "John Bellingham", :email => "dontchange@example.com", "@role_name" => "Leasee"}},
+            {:role => {:name => "Tim Else", :email => "noemail@rightsignature.com", "@role_name" => "Leaser"}}
+          ]
+        }}).and_return(@sent_document_response)
+      RightSignature::Connection.should_receive(:get).with("/api/documents/ABCDEFGH123/signer_links.xml", {}).and_return({"document" => {
+        "signer_links" => [
+          {"signer_link" => {"name" => "John Bellingham", "email" => "dontchange@example.com", "role" => "signer_A", "signer_token" => "slkfj2"}},
+          {"signer_link" => {"name" => "Tim Else", "role" => "signer_B", "signer_token" => "asfd1"}}
+        ]
+      }})
+      
+      results = RightSignature::Template.send_as_embedded_signers("TGUID", [
+        {"Leasee" => {:name => "John Bellingham", :email => "dontchange@example.com"}}, 
         {"Leaser" => {:name => "Tim Else"}}
       ])
       results.size.should == 2

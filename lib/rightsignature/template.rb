@@ -225,11 +225,7 @@ module RightSignature
 
         recipients.each do |role_hash|
           key, value = role_hash.first
-          if role_hash[key]["email"]
-            role_hash[key]["email"] = "noemail@rightsignature.com"
-          else
-            role_hash[key][:email] = "noemail@rightsignature.com"
-          end
+          role_hash[key][:email] = "noemail@rightsignature.com" unless role_hash[key]["email"] || role_hash[key][:email]
         end
         
         response = send_template(template["guid"], options[:subject] || template["subject"], recipients, options)
