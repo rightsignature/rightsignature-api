@@ -199,6 +199,7 @@ Optional options:
      Ex. ['sent_from_api', {"user_id" => "32"}]
  * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
      Ex. "http://yoursite/callback"
+ * use_merge_field_ids: Using merge field ids instead of merge field name for merge_fields. true or false.
 
 #####Template Prepacking
 For cloning a Template before sending it.
@@ -223,7 +224,8 @@ RightSignature::Template.prefill(guid, subject, roles)
        Ex. ['sent_from_api', {"user_id" => "32"}]
    * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
        Ex. "http://yoursite/callback"
-
+   * use_merge_field_ids: Using merge field ids instead of merge field name for merge_fields. true or false.
+  
 ```
 options = {
   :description => "Please read over the handbook and sign it.",
@@ -259,6 +261,7 @@ RightSignature::Template.send_template(guid, subject, roles)
        Ex. ['sent_from_api', {"user_id" => "32"}]
    * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
        Ex. "http://yoursite/callback"
+   * use_merge_field_ids: Using merge field ids instead of merge field name for merge_fields. true or false.
 
 ```
 options = {
@@ -296,6 +299,7 @@ RightSignature::Template.send_as_embedded_signers(guid, recipients, options={})
    * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
        Ex. "http://yoursite/callback"
    * redirect_location: URL to redirect users after signing.
+   * use_merge_field_ids: Using merge field ids instead of merge field name for merge_fields. true or false.
 
 #####Create New Template Link
 Generate a url that let's someone upload and create a template under OAuth user's account.
@@ -385,6 +389,5 @@ $:.push File.expand_path("../lib", __FILE__); require "rightsignature"; RightSig
 
 TODO:
 -----
-* Switch to using merge field ids instead of name?
 * Parse error message from response body on unsuccessful requests
 * Have a way for to generate an OAuth Access Token from RightSignature

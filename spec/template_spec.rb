@@ -80,6 +80,24 @@ describe RightSignature::Template do
       })
       RightSignature::Template.prefill("MYGUID", "sign me", [{"Employee" => {:name => "John Employee", :email => "john@employee.com"}}])
     end
+    
+    it "should add \"@role_id\"=>'signer_A' key to roles in xml hash" do
+      RightSignature::Connection.should_receive(:post).with('/api/templates.xml', {
+        :template => {
+          :guid => "MYGUID", 
+          :action => "prefill",
+          :subject => "sign me", 
+          :roles => [
+            {:role => {
+              :name => "John Employee", 
+              :email => "john@employee.com", 
+              "@role_id" => "signer_A"
+            }}
+          ]
+        }
+      })
+      RightSignature::Template.prefill("MYGUID", "sign me", [{"signer_A" => {:name => "John Employee", :email => "john@employee.com"}}])
+    end
 
     describe "optional options" do
       it "should add \"@merge_field_name\"=>'Tax_id' key to merge_fields in xml hash" do
@@ -94,6 +112,20 @@ describe RightSignature::Template do
           }
         })
         RightSignature::Template.prefill("MYGUID", "sign me", [], {:merge_fields => [{"Tax_id" => "123456"}]})
+      end
+
+      it "should add \"@merge_field_id\"=>'123_abc_78' key to merge_fields in xml hash" do
+        RightSignature::Connection.should_receive(:post).with('/api/templates.xml', {
+          :template => {
+            :guid => "MYGUID", 
+            :action => "prefill",
+            :subject => "sign me", 
+            :roles => [
+            ],
+            :merge_fields => [{:merge_field => {:value => "123456", "@merge_field_id" => "123_abc_78"}}]
+          }
+        })
+        RightSignature::Template.prefill("MYGUID", "sign me", [], {:merge_fields => [{"123_abc_78" => "123456"}], :use_merge_field_ids => true})
       end
 
       it "should add \"tag\" key to tags in xml hash" do

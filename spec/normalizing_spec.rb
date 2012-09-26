@@ -53,5 +53,15 @@ describe RightSignature::Helpers::MergeFieldsHelper do
       results.include?({:merge_field => {:value => "Santa Barbara", "@merge_field_name" => "City"}})
       results.include?({:merge_field => {:value => "House", "@merge_field_name" => "Section"}})
     end
+
+    it "should convert array of {\"Merge field name\" => \"Merge Field Value\"} to array of {:merge_field => {:value => \"Merge Field Value\", \"@merge_field_id\" => \"Merge Field Name\"}} " do
+      results = RightSignature::Helpers::MergeFieldsHelper.array_to_xml_hash([
+        {"1_abc_defg" => "Santa Barbara"},
+        {"2_345_789" => "House"}
+      ], true)
+      results.size.should == 2
+      results.include?({:merge_field => {:value => "Santa Barbara", "@merge_field_id" => "1_abc_defg"}})
+      results.include?({:merge_field => {:value => "House", "@merge_field_id" => "2_345_789"}})
+    end
   end
 end

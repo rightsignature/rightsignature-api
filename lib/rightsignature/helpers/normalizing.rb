@@ -60,11 +60,15 @@ module RightSignature::Helpers
     class <<self
       # Converts [{"Role Name" => {:name => "John", :email => "email@example.com"}}] to 
       #   [{"role roles_name=\"Role Name\"" => {:role => {:name => "John", :email => "email@example.com"}} }]
-      def array_to_xml_hash(merge_fields_array)
+      def array_to_xml_hash(merge_fields_array, use_id=false)
         merge_fields = []
         merge_fields_array.each do |merge_field_hash|
           name, value = merge_field_hash.first
-          merge_fields << { :merge_field => {:value => value, "@merge_field_name" => name}}
+          if use_id
+            merge_fields << { :merge_field => {:value => value, "@merge_field_id" => name}}
+          else
+            merge_fields << { :merge_field => {:value => value, "@merge_field_name" => name}}
+          end
         end
 
         merge_fields
