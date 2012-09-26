@@ -8,7 +8,7 @@ gem install rightsignature
 ```
 or in your Gemfile
 ```
-gem 'rightsignature', '~> 0.1.5'
+gem 'rightsignature', '~> 0.1.6'
 ```
 
 Setup
@@ -130,7 +130,7 @@ RightSignature::Document.send_document_from_file(File.open("here/is/myfile.pdf",
 ```
 * subject: Document subject
 * recipients: Recipients of the document, should be an array of hashes with :name, :email, and :role ('cc' or 'signer'). 
-    An optional :is_sender => true can be used to reference the API User and won't need to supply :name and :email. Ex. {:is_sender => true, :role => "cc"}
+    One recipient requires a :is_sender => true to reference the API User and doesn't need to supply :name and :email. Ex. {:is_sender => true, :role => "cc"}
 * Optional options:
     * description: document description that'll appear in the email
     * action: 'send' or 'redirect'. Redirect will prefill the document and generate a redirect token that can be used on for someone to send document under API user's account.
