@@ -211,16 +211,18 @@ After prepacking, the new template can be updated with prefill data. This won't 
 ```
 RightSignature::Template.prefill(guid, subject, roles)
 ```
-
-Optional options:
- * description: document description that'll appear in the email
- * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
-     Ex. [{"Salary" => "$1,000,000"}]
- * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
- * tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
-     Ex. ['sent_from_api', {"user_id" => "32"}]
- * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
-     Ex. "http://yoursite/callback"
+ * guid: template guid to use. Should be a template that was prepackaged
+ * subject: document subject. 
+ * roles: recipient names in array of {:name => "Person's Name", :email => "Email"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name", :name => "a@example.com"}}
+ * Optional options:
+   * description: document description that'll appear in the email
+   * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+       Ex. [{"Salary" => "$1,000,000"}]
+   * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
+   * tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
+       Ex. ['sent_from_api', {"user_id" => "32"}]
+   * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+       Ex. "http://yoursite/callback"
 
 ```
 options = {
@@ -245,16 +247,18 @@ Send template as a document for signing. Same options as prefill.
 ```
 RightSignature::Template.send_template(guid, subject, roles)
 ```
-
-Optional options:
- * description: document description that'll appear in the email
- * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
-     Ex. [{"Salary" => "$1,000,000"}]
- * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
- * tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
-     Ex. ['sent_from_api', {"user_id" => "32"}]
- * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
-     Ex. "http://yoursite/callback"
+ * guid: template guid to use. Should be a template that was prepackaged
+ * subject: document subject. 
+ * roles: recipient names in array of {:name => "Person's Name", :email => "Email"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name", :name => "a@example.com"}}
+ * Optional options:
+   * description: document description that'll appear in the email
+   * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+       Ex. [{"Salary" => "$1,000,000"}]
+   * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
+   * tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
+       Ex. ['sent_from_api', {"user_id" => "32"}]
+   * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+       Ex. "http://yoursite/callback"
 
 ```
 options = {
@@ -280,7 +284,7 @@ Returns an array of {:name => "John Bellingham", "url" => "https://rightsignatur
 RightSignature::Template.send_as_embedded_signers(guid, recipients, options={})
 ```
  * guid: guid of template to create document with
- * recipient: recipient names in array of {"Role Name" => {:name => "Your Name"}}
+ * recipient: recipient names in array of {:name => "Person's Name"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name"}}
  * options:
    * subject: document subject that'll appear in the email
    * description: document description that'll appear in the email
@@ -381,5 +385,6 @@ $:.push File.expand_path("../lib", __FILE__); require "rightsignature"; RightSig
 
 TODO:
 -----
+* Switch to using merge field ids instead of name?
 * Parse error message from response body on unsuccessful requests
 * Have a way for to generate an OAuth Access Token from RightSignature
