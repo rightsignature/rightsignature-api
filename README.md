@@ -154,6 +154,15 @@ filename = "Desired Filename.pdf"
 RightSignature::Document.send_document_from_file(raw_data, filename, 'My Subject', recipients)
 ```
 
+#####Embedded Signing Links
+Generates URLs for the embedded signing page for documents with recipients with email of 'noemail@rightsignature.com'. 
+Returns an array of {:name => "John Bellingham", "url" => "https://rightsignature.com/signatures/embedded?rt=1234"}
+```
+RightSignature::Document.get_signer_links_for(guid, redirect_location=nil)
+```
+Optional Option:
+ * redirect_location: URL to redirect user after signing.
+
 
 Templates
 ---------

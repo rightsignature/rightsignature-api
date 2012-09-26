@@ -253,4 +253,31 @@ describe RightSignature::Document do
       RightSignature::Document.generate_document_redirect_url("subjy", [], {}).should == "#{RightSignature::Connection.site}/builder/new?rt=REDIRECT_TOKEN"
     end
   end
+  
+  describe "get_signer_links_for" do
+    it "should GET /api/documents/GUID123/signer_links.xml and return urls for signers" do
+      RightSignature::Connection.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {}).and_return({'document' => {'signer_links' => [
+        {'signer_link' => {"signer_token" => "avx37", "name" => "John Bellingham"}}, 
+        {'signer_link' => {"signer_token" => "fdh89", "name" => "Righty Jones"}}]
+      }})
+      
+      response = RightSignature::Document.get_signer_links_for("GUID123")
+      response.size.should == 2
+      response.include?({"name" => "John Bellingham", "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=avx37"}).should be_true
+      response.include?({"name" => "Righty Jones", "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=fdh89"}).should be_true
+    end
+
+    it "should GET /api/documents/GUID123/signer_links.xml with URI encoded redirect location and return urls for signers" do
+      RightSignature::Connection.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {:redirect_location => "http://google.com/redirected%20location"}
+      ).and_return({"document" => {'signer_links' => [
+        {'signer_link' => {"signer_token" => "avx37", "name" => "John Bellingham", "role" => "signer_A"}}, 
+        {'signer_link' => {"signer_token" => "fdh89", "name" => "Righty Jones", "role" => "signer_B"}}]
+      }})
+      
+      response = RightSignature::Document.get_signer_links_for("GUID123", "http://google.com/redirected location")
+      response.size.should == 2
+      response.include?({"name" => "John Bellingham", "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=avx37"}).should be_true
+      response.include?({"name" => "Righty Jones", "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=fdh89"}).should be_true
+    end
+  end
 end

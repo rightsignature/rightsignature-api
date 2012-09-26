@@ -211,6 +211,18 @@ module RightSignature
         "#{RightSignature::Connection.site}/builder/new?rt=#{response['document']['redirect_token']}"
       end
       
+      def get_signer_links_for(guid, redirect_location = nil)
+        params = {}
+        params[:redirect_location] = URI.encode(redirect_location) if redirect_location
+        response = RightSignature::Connection.get "/api/documents/#{guid}/signer_links.xml", params
+        
+        signer_links = []
+        response["document"]["signer_links"].each do |signer_link|
+          signer_links << {"name" => signer_link["signer_link"]["name"], "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=#{signer_link["signer_link"]["signer_token"]}"}
+        end
+        signer_links
+      end
+      
     end
   end
 end
