@@ -3,3 +3,4 @@
 .rvmrc
 *.swp
 *.swo
+Gemfile.lock
