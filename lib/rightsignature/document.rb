@@ -217,8 +217,14 @@ module RightSignature
         response = RightSignature::Connection.get "/api/documents/#{guid}/signer_links.xml", params
         
         signer_links = []
-        response["document"]["signer_links"].each do |signer_link|
-          signer_links << {"name" => signer_link["signer_link"]["name"], "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=#{signer_link["signer_link"]["signer_token"]}"}
+        
+        if response["document"]["signer_links"]["signer_link"].is_a? Array
+          response["document"]["signer_links"]["signer_link"].each do |signer_link|
+            signer_links << {"name" => signer_link["name"], "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=#{signer_link["signer_token"]}"}
+          end
+        else
+          signer_link = response["document"]["signer_links"]["signer_link"]
+          signer_links << {"name" => signer_link["name"], "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=#{signer_link["signer_token"]}"}
         end
         signer_links
       end
