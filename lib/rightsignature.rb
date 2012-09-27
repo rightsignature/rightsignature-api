@@ -51,7 +51,6 @@ module RightSignature
       return true
     end
     
-  private
     def oauth_keys
       [:consumer_key, :consumer_secret, :access_token, :access_secret].freeze
     end
