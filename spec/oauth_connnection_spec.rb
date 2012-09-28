@@ -17,7 +17,8 @@ describe RightSignature::OauthConnection do
       lambda{RightSignature::OauthConnection.oauth_consumer}.should raise_error(Exception, "Please set load_configuration with consumer_key, consumer_secret, access_token, access_secret")
     end
     
-    it "should return consumer if configuration set" do
+    it "should return consumer if consumer_key and consumer_secret is set" do
+      RightSignature::configuration = {:consumer_key => "Consumer123", :consumer_secret => "Secret098"}
       OAuth::Consumer.should_receive(:new).with(
         "Consumer123",
         "Secret098",
@@ -39,12 +40,18 @@ describe RightSignature::OauthConnection do
       RightSignature::OauthConnection.instance_variable_set("@access_token", nil)
     end
     
-    it "should raise error if no configuration is set" do
-      RightSignature::configuration = {}
+    it "should raise error if access_token is not set" do
+      RightSignature::configuration = {:consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_secret => "Secret098"}
+      lambda{RightSignature::OauthConnection.access_token}.should raise_error(Exception, "Please set load_configuration with consumer_key, consumer_secret, access_token, access_secret")
+    end
+
+    it "should raise error if access_secret is not set" do
+      RightSignature::configuration = {:consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_token => "AccessToken098"}
       lambda{RightSignature::OauthConnection.access_token}.should raise_error(Exception, "Please set load_configuration with consumer_key, consumer_secret, access_token, access_secret")
     end
     
     it "should create OAuth access token with credentials" do
+      RightSignature::configuration = {:consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_token => "AccessToken098", :access_secret => "AccessSecret123"}
       OAuth::Consumer.should_receive(:new).and_return(@consumer_mock)
       OAuth::AccessToken.should_receive(:new).with(@consumer_mock, 'AccessToken098', 'AccessSecret123')
 

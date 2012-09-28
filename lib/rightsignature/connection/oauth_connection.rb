@@ -3,7 +3,7 @@ module RightSignature
 
     class << self
       def oauth_consumer
-        check_credentials
+        check_credentials unless RightSignature::configuration[:consumer_key] && RightSignature::configuration[:consumer_secret]
         @oauth_consumer ||= OAuth::Consumer.new(
           RightSignature::configuration[:consumer_key],
           RightSignature::configuration[:consumer_secret],
