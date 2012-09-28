@@ -13,7 +13,7 @@ gem 'rightsignature', '~> 0.1.6'
 
 Setup
 -----
-After getting an API key from RightSignature, you can use the Secure Token or generate an Access Token with the OAuth key and secret using RightSignature::load_configuration.
+After getting an API key from RightSignature, you can use the Secure Token or generate an Access Token with the OAuth key and secret using RightSignature::load_configuration. Below are examples on how to use the gem as yourself.
 
 #####Using Token authentication
 ```
@@ -31,8 +31,36 @@ RightSignature::load_configuration(
 ```
 Note: if the both OAuth credentials and api_token are set, the default action is to use Token Authentication.
 
+#####Getting Access Token
+Make sure you have a server that is can recieve the parameters from RightSignature and the callback is setup correctly in the RightSignature API settings (https://rightsignature.com/oauth_clients).
+```
+request_token = RightSignature::OauthConnection.new_request_token
+```
 
-After loading the configuration, you can use wrappers in RightSignature::Document or RightSignature::Template to call the API. Or use RightSignature::Connection for a more custom call.
+Now Visit the url generated from
+```
+RightSignature::OauthConnection.request_token.authorize_url
+```
+and log into the site.
+
+After approving the application, you will be redirected to the callback url that is in the RightSignature API settings (https://rightsignature.com/oauth_clients). The OAuth verifier should be in the params "oauth_verifier". Put the verifier in:
+```
+RightSignature::OauthConnection.generate_access_token(params[:oauth_verifer])
+```
+
+Now, you should have your Connection setup. You can save the access token and access token secret for later use and skip the previous steps.
+```
+RightSignature::OauthConnection.access_token.token
+RightSignature::OauthConnection.access_token.secret
+```
+Will give you the Access Token's token and secret.
+
+You can also load the Access Token and Secret by calling
+```
+RightSignature::OauthConnection.set_access_token(token, secret)
+```
+
+After loading the configuration, you can use wrappers in RightSignature::Document, RightSignature::Template, or RightSignature::Account to call the API. Or use RightSignature::Connection for a more custom call.
 
 Documents
 ---------
@@ -393,4 +421,3 @@ $:.push File.expand_path("../lib", __FILE__); require "rightsignature"; RightSig
 TODO:
 -----
 * Parse error message from response body on unsuccessful requests
-* Have a way for to generate an OAuth Access Token from RightSignature
