@@ -1,6 +1,11 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
 describe RightSignature::TokenConnection do
+  it "should raise error if no configuration is set" do
+    RightSignature::configuration = {}
+    lambda{RightSignature::TokenConnection.request(:get, "path", {:query => {:search => 'hey there'}})}.should raise_error(Exception, "Please set load_configuration with api_token")
+  end
+
   it "should create 'api-token' to headers with :api_token credentials, accept of '*/*', and content-type of xml with given method" do
     RightSignature::TokenConnection.should_receive(:get).with("path", {:query => {:search => 'hey there'}, :headers => {"api-token" => "APITOKEN", "Accept" => "*/*", "content-type" => "application/xml"}}).and_return(stub("HTTPartyResponse", :parsed_response => nil))
     RightSignature::TokenConnection.request(:get, "path", {:query => {:search => 'hey there'}})
