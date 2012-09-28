@@ -8,7 +8,30 @@ module RightSignature
           RightSignature::OauthConnection.oauth_consumer.site
         end
       end
-      
+
+      def put(url, body={}, headers={})
+        if RightSignature::has_api_token?
+          options = {}
+          options[:headers] = headers
+          options[:body] = XmlFu.xml(body)
+          
+          parse_response(RightSignature::TokenConnection.request(:put, url, options))
+        else
+          parse_response(RightSignature::OauthConnection.request(:put, url, XmlFu.xml(body), headers))
+        end
+      end
+
+      def delete(url, headers={})
+        if RightSignature::has_api_token?
+          options = {}
+          options[:headers] = headers
+
+          parse_response(RightSignature::TokenConnection.request(:delete, url, options))
+        else
+          parse_response(RightSignature::OauthConnection.request(:delete, url, headers))
+        end
+      end
+
       def get(url, params={}, headers={})
         RightSignature::check_credentials
         
@@ -16,13 +39,12 @@ module RightSignature
           options = {}
           options[:headers] = headers
           options[:query] = params
-          RightSignature::TokenConnection.request(:get, url, options).parsed_response
+          parse_response(RightSignature::TokenConnection.request(:get, url, options))
         else
           unless params.empty?
             url = "#{url}?#{params.sort.map{|param| URI.escape("#{param[0]}=#{param[1]}")}.join('&')}"
           end
-          res = RightSignature::OauthConnection.request(:get, url, headers)
-          MultiXml.parse(res.body)
+          parse_response(RightSignature::OauthConnection.request(:get, url, headers))
         end
       end
 
@@ -33,26 +55,30 @@ module RightSignature
           options = {}
           options[:headers] = headers
           options[:body] = XmlFu.xml(body)
-          res = RightSignature::TokenConnection.request(:post, url, options)
-
-          unless res.success?
-            puts res.body
-            raise RightSignature::ResponseError.new(res)
-          end
-
-          res.parsed_response
+          parse_response(RightSignature::TokenConnection.request(:post, url, options))
         else
-          res = RightSignature::OauthConnection.request(:post, url, XmlFu.xml(body), headers)
-
-          unless res.is_a? Net::HTTPSuccess
-            puts res.body
-            raise RightSignature::ResponseError.new(res)
-          end
-
-          MultiXml.parse(res.body)
+          parse_response(RightSignature::OauthConnection.request(:post, url, XmlFu.xml(body), headers))
         end
       end
+      
+      def parse_response(response)
+        if response.is_a? Net::HTTPResponse
+          unless response.is_a? Net::HTTPSuccess
+            puts response.body
+            raise RightSignature::ResponseError.new(response)
+          end
+
+          MultiXml.parse(response.body)
+        else
+          unless response.success?
+            puts response.body
+            raise RightSignature::ResponseError.new(response)
+          end
+          
+          response.parsed_response
+        end
+      end
+      
     end
-    
   end
 end
