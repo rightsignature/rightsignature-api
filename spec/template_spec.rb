@@ -301,10 +301,10 @@ describe RightSignature::Template do
           ]
         }}).and_return(@sent_document_response)
       RightSignature::Connection.should_receive(:get).with("/api/documents/ABCDEFGH123/signer_links.xml", {}).and_return({"document" => {
-        "signer_links" => [
-          {"signer_link" => {"name" => "John Bellingham", "role" => "signer_A", "signer_token" => "slkfj2"}},
-          {"signer_link" => {"name" => "Tim Else", "role" => "signer_B", "signer_token" => "asfd1"}}
-        ]
+        "signer_links" => {"signer_link" => [
+          {"name" => "John Bellingham", "role" => "signer_A", "signer_token" => "slkfj2"},
+          {"name" => "Tim Else", "role" => "signer_B", "signer_token" => "asfd1"}
+        ]}
       }})
       
       
@@ -331,10 +331,10 @@ describe RightSignature::Template do
           ]
         }}).and_return(@sent_document_response)
       RightSignature::Connection.should_receive(:get).with("/api/documents/ABCDEFGH123/signer_links.xml", {}).and_return({"document" => {
-        "signer_links" => [
-          {"signer_link" => {"name" => "John Bellingham", "email" => "dontchange@example.com", "role" => "signer_A", "signer_token" => "slkfj2"}},
-          {"signer_link" => {"name" => "Tim Else", "role" => "signer_B", "signer_token" => "asfd1"}}
-        ]
+        "signer_links" => {"signer_link" => [
+          {"name" => "John Bellingham", "email" => "dontchange@example.com", "role" => "signer_A", "signer_token" => "slkfj2"},
+          {"name" => "Tim Else", "role" => "signer_B", "signer_token" => "asfd1"}
+        ]}
       }})
       
       results = RightSignature::Template.send_as_embedded_signers("TGUID", [
