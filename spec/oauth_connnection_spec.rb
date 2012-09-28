@@ -13,12 +13,11 @@ describe RightSignature::OauthConnection do
     end
 
     it "should raise error if no configuration is set" do
-      RightSignature.should_receive(:has_oauth_credentials?).and_return(false)
+      RightSignature::configuration = {}
       lambda{RightSignature::OauthConnection.oauth_consumer}.should raise_error(Exception, "Please set load_configuration with consumer_key, consumer_secret, access_token, access_secret")
     end
     
     it "should return consumer if configuration set" do
-      RightSignature.should_receive(:has_oauth_credentials?).and_return(true)
       OAuth::Consumer.should_receive(:new).with(
         "Consumer123",
         "Secret098",
@@ -41,7 +40,7 @@ describe RightSignature::OauthConnection do
     end
     
     it "should raise error if no configuration is set" do
-      RightSignature.should_receive(:has_oauth_credentials?).and_return(false)
+      RightSignature::configuration = {}
       lambda{RightSignature::OauthConnection.access_token}.should raise_error(Exception, "Please set load_configuration with consumer_key, consumer_secret, access_token, access_secret")
     end
     
@@ -55,7 +54,7 @@ describe RightSignature::OauthConnection do
 
   describe "request" do
     it "should raise error if no configuration is set" do
-      RightSignature.should_receive(:has_oauth_credentials?).and_return(false)
+      RightSignature::configuration = {}
       lambda{RightSignature::OauthConnection.request(:get, "path", {"User-Agent" => 'My own'})}.should raise_error(Exception, "Please set load_configuration with consumer_key, consumer_secret, access_token, access_secret")
     end
     
