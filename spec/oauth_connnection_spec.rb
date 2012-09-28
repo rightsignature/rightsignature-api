@@ -38,6 +38,7 @@ describe RightSignature::OauthConnection do
     after do
       # Reset caching of oauth_consumer
       RightSignature::OauthConnection.instance_variable_set("@access_token", nil)
+      RightSignature::OauthConnection.instance_variable_set("@oauth_consumer", nil)
     end
     
     it "should raise error if access_token is not set" do
@@ -56,6 +57,43 @@ describe RightSignature::OauthConnection do
       OAuth::AccessToken.should_receive(:new).with(@consumer_mock, 'AccessToken098', 'AccessSecret123')
 
       RightSignature::OauthConnection.access_token
+    end
+    
+    describe "set_access_token" do
+      it "should create new access_token with given token and secret" do
+        OAuth::Consumer.stub(:new).and_return(@consumer_mock)
+        OAuth::AccessToken.should_receive(:new).with(@consumer_mock, "newAToken", "newASecret").and_return(@access_token_mock)
+
+        RightSignature::OauthConnection.set_access_token("newAToken","newASecret")
+        RightSignature::OauthConnection.access_token.should == @access_token_mock
+      end
+    end
+  end
+  
+  describe "new_request_token" do
+    it "should generate new RequestToken from consumer" do
+      request_mock = mock(OAuth::RequestToken)
+      OAuth::Consumer.stub(:new).and_return(@consumer_mock)
+      @consumer_mock.should_receive(:get_request_token).and_return(request_mock)
+      RightSignature::OauthConnection.new_request_token
+      RightSignature::OauthConnection.request_token.should == request_mock
+    end
+  end
+
+  describe "generate_access_token" do
+    it "should raise error if there is no request_token" do
+      # Reset request_token cache"
+      RightSignature::OauthConnection.instance_variable_set("@request_token", nil)
+      lambda{RightSignature::OauthConnection.generate_access_token("verifi123")}.should raise_error(Exception, "Please set request token with new_request_token")
+    end
+
+    it "should get access token from request token with given verifier" do
+      request_token_mock = mock(OAuth::RequestToken)
+      request_token_mock.should_receive(:get_access_token).with({:oauth_verifier => "verifi123"}).and_return(@access_token_mock)
+      RightSignature::OauthConnection.instance_variable_set("@request_token", request_token_mock)
+
+      RightSignature::OauthConnection.generate_access_token("verifi123")
+      RightSignature::OauthConnection.access_token.should == @access_token_mock
     end
   end
 
