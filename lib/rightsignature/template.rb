@@ -148,7 +148,7 @@ module RightSignature
       #     - redirect_location: A URI encoded URL that specifies the location we will redirect the user to, after they have created a template.
       #     - tags: tags to add to the template. an array of 'tag_name' (for simple tag) or {'tag_name' => 'value'} (for tuples pairs)
       #         Ex. ['created_from_api', {"user_id" => "123"}]
-      #     - acceptabled_role_names: The user creating the Template will be forced to select one of the values provided. 
+      #     - acceptable_role_names: The user creating the Template will be forced to select one of the values provided. 
       #         There will be no free-form name entry when adding roles to the Template. An array of strings. 
       #         Ex. ["Employee", "Employeer"]
       #     - acceptable_merge_field_names: The user creating the Template will be forced to select one of the values provided. 
@@ -158,7 +158,7 @@ module RightSignature
         xml_hash = {:template => {}}
         xml_hash[:template][:tags] = TagsHelper.array_to_xml_hash(options[:tags]) if options[:tags]
         
-        [:acceptable_merge_field_names, :acceptabled_role_names].each do |option|
+        [:acceptable_merge_field_names, :acceptable_role_names].each do |option|
           xml_hash[:template][option] = array_to_acceptable_names_hash(options[option]) if options[option]
         end
         
