@@ -203,15 +203,15 @@ describe RightSignature::Template do
         RightSignature::Template.generate_build_url(:acceptable_merge_field_names => ["Site ID", "Starting City"])
       end
 
-      it "should include normalized :acceptabled_role_names, in params" do
+      it "should include normalized :acceptable_role_names, in params" do
         RightSignature::Connection.should_receive(:post).with("/api/templates/generate_build_token.xml", {:template => 
-          {:acceptabled_role_names => 
+          {:acceptable_role_names => 
             [
               {:name => "Http Monster"}, 
               {:name => "Party Monster"}
             ]}
         }).and_return({"token"=>{"redirect_token" => "REDIRECT_TOKEN"}})
-        RightSignature::Template.generate_build_url(:acceptabled_role_names => ["Http Monster", "Party Monster"])
+        RightSignature::Template.generate_build_url(:acceptable_role_names => ["Http Monster", "Party Monster"])
       end
 
       it "should include normalized :tags in params" do
