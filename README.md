@@ -343,7 +343,7 @@ You can also add restrictions to what the person can do:
  * redirect_location: A URI encoded URL that specifies the location we will redirect the user to, after they have created a template.
  * tags: tags to add to the template. an array of strings (for simple tag) or hashes like {'tag_name' => 'tag_value'} (for tuples pairs)
      Ex. ['created_from_api', {"user_id" => "123"}]
- * acceptabled_role_names: The user creating the Template will be forced to select one of the values provided. 
+ * acceptable_role_names: The user creating the Template will be forced to select one of the values provided. 
      There will be no free-form name entry when adding roles to the Template. An array of strings. 
      Ex. ["Employee", "Employeer"]
  * acceptable_merge_field_names: The user creating the Template will be forced to select one of the values provided. 
@@ -357,7 +357,7 @@ options = {
       {:name => "Site ID"}, 
       {:name => "Starting City"}
     ],
-  :acceptabled_role_names => 
+  :acceptable_role_names => 
     [
       {:name => "Http Monster"}, 
       {:name => "Party Monster"}
