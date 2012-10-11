@@ -113,7 +113,7 @@ RightSignature::Document.batch_details(guids)
 
 #####Send Reminder
 ```
-RightSignature::Document.resend_reminder(guid)
+RightSignature::Document.send_reminder(guid)
 ```
 
 #####Trash Document
