@@ -13,16 +13,16 @@ gem 'rightsignature', '~> 0.1.8'
 
 Setup
 -----
-After getting an API key from RightSignature, you can use the Secure Token or generate an Access Token with the OAuth key and secret using RightSignature::load_configuration. Below are examples on how to use the gem as yourself.
+After getting an API key from RightSignature, you can use the Secure Token or generate an Access Token with the OAuth key and secret using RightSignature::Connection.new. Below are examples on how to use the gem as yourself.
 
 #####Using Token authentication
 ```
-RightSignature::load_configuration(:api_token => YOUR_TOKEN)
+@rs_connection = RightSignature::Connection.new(:api_token => YOUR_TOKEN)
 ```
 
 #####Using OAuth authentication
 ```
-RightSignature::load_configuration(
+@rs_connection = RightSignature::Connection.new(
   :consumer_key => "Consumer123", 
   :consumer_secret => "Secret098", 
   :access_token => "AccessToken098", 
@@ -34,42 +34,42 @@ Note: if the both OAuth credentials and api_token are set, the default action is
 #####Getting Access Token
 Make sure you have a server that is can recieve the parameters from RightSignature and the callback is setup correctly in the RightSignature API settings (https://rightsignature.com/oauth_clients).
 ```
-request_token = RightSignature::OauthConnection.new_request_token
+request_token = @rs_connection.new_request_token
 ```
 
 Now Visit the url generated from
 ```
-RightSignature::OauthConnection.request_token.authorize_url
+@rs_oauth = RightSignature::OauthConnection.new(@rs_connection)
+@rs_oauth.request_token.authorize_url
 ```
 and log into the site.
 
 After approving the application, you will be redirected to the callback url that is in the RightSignature API settings (https://rightsignature.com/oauth_clients). The OAuth verifier should be in the params "oauth_verifier". Put the verifier in:
 ```
-RightSignature::OauthConnection.generate_access_token(params[:oauth_verifer])
+@rs_oauth = RightSignature::OauthConnection.new(@rs_connection)
+@rs_oauth.generate_access_token(params[:oauth_verifer])
 ```
 
 Now, you should have your Connection setup. You can save the access token and access token secret for later use and skip the previous steps.
 ```
-RightSignature::OauthConnection.access_token.token
-RightSignature::OauthConnection.access_token.secret
+@rs_oauth.access_token.token
+@rs_oauth.access_token.secret
 ```
 Will give you the Access Token's token and secret.
 
 You can also load the Access Token and Secret by calling
 ```
-RightSignature::OauthConnection.set_access_token(token, secret)
+@rs_oauth.set_access_token(token, secret)
 ```
 
-After loading the configuration, you can use wrappers in RightSignature::Document, RightSignature::Template, or RightSignature::Account to call the API. Or use RightSignature::Connection for a more custom call.
+After loading the configuration, you can use wrappers in RightSignature::Connection to call the API, or use RightSignature::Connection for more custom calls.
 
 Documents
 ---------
-API calls involving documents are wrapped in the RightSignature::Document class.
-
 #####Listing Document
 For showing all documents
 ```
-RightSignature::Document.list
+@rs_connection.documents_list
 ```
 
 For showing page 1 of completed and trashed documents, with 20 per page, matching search term 'me', with tag "single_tag" and tag "key" with value of "with_value"
@@ -81,7 +81,7 @@ options = {
   :search => "me",
   :tags => ["single_tag", "key" => "with_value"]
 }
-RightSignature::Document.list(options)
+@rs_connection.documents_list(options)
 ```
 Optional Options:
  * page: page number
@@ -102,34 +102,34 @@ Optional Options:
 
 #####Document Details
 ```
-RightSignature::Document.details(guid)
+@rs_connection.document_details(guid)
 ```
 
 #####Document Details for Multiple documents
 ```
-RightSignature::Document.batch_details(guids)
+@rs_connection.documents_batch_details(guids)
 ```
  * guids: Array of document GUIDs
 
 #####Send Reminder
 ```
-RightSignature::Document.resend_reminder(guid)
+@rs_connection.send_reminder(guid)
 ```
 
 #####Trash Document
 ```
-RightSignature::Document.trash(guid)
+@rs_connection.trash_document(guid)
 ```
 
 #####Extend Expiration of Document by 7 days
 ```
-RightSignature::Document.extend_expiration(guid)
+@rs_connection.extend_expiration(guid)
 ```
 
 #####Replace Tags on Document
 ```
 tags=['sent_from_api', {'user_id' => '12345'}]
-RightSignature::Document.update_tags(guid, tags)
+@rs_connection.update_document_tags(guid, tags)
 ```
  * guid
  * tags: An array of 'tag_name' or {'tag_name' => 'tag_value'}
@@ -150,11 +150,11 @@ options={
   'use_text_tags' => false
 }
 
-RightSignature::Document.send_document_from_file("here/is/myfile.pdf", 'My Subject', recipients, options)
+@rs_connection.send_document_from_file("here/is/myfile.pdf", 'My Subject', recipients, options)
 ```
 Or
 ```
-RightSignature::Document.send_document_from_file(File.open("here/is/myfile.pdf", 'r'), 'My Subject', recipients)
+@rs_connection.send_document_from_file(File.open("here/is/myfile.pdf", 'r'), 'My Subject', recipients)
 ```
 * subject: Document subject
 * recipients: Recipients of the document, should be an array of hashes with :name, :email, and :role ('cc' or 'signer'). 
@@ -179,14 +179,14 @@ recipients = [
 ]
 raw_data = File.read("here/is/myfile.pdf")
 filename = "Desired Filename.pdf"
-RightSignature::Document.send_document_from_file(raw_data, filename, 'My Subject', recipients)
+@rs_connection.send_document_from_file(raw_data, filename, 'My Subject', recipients)
 ```
 
 #####Embedded Signing Links
 Generates URLs for the embedded signing page for documents with recipients with email of 'noemail@rightsignature.com'. 
 Returns an array of {:name => "John Bellingham", "url" => "https://rightsignature.com/signatures/embedded?rt=1234"}
 ```
-RightSignature::Document.get_signer_links_for(guid, redirect_location=nil)
+@rs_connection.get_document_signer_links_for(guid, redirect_location=nil)
 ```
 Optional Option:
  * redirect_location: URL to redirect user after signing.
@@ -194,11 +194,9 @@ Optional Option:
 
 Templates
 ---------
-API calls involving documents are wrapped in the RightSignature::Template class.
-
 #####Listing Templates
 ```
-RightSignature::Template.list(options={})
+@rs_connection.templates_list(options={})
 ```
 Optional Options:
  * page: page number
@@ -210,13 +208,13 @@ Optional Options:
 
 #####Template Details
 ```
-RightSignature::Template.details(guid)
+@rs_connection.template_details(guid)
 ```
 
 #####Prepackage and Send template
 Most common use of API, clones a template and sends it for signature.
 ```
-RightSignature::Template.prepackage_and_send(guid, roles, options={})
+@rs_connection.prepackage_and_send(guid, roles, options={})
 ```
  * guid: template guid to use. Should be a template that was prepackaged
  * roles: recipient names in array of {:name => "Person's Name", :email => "Email"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name", :name => "a@example.com"}}
@@ -235,13 +233,13 @@ Optional options:
 #####Template Prepacking
 For cloning a Template before sending it.
 ```
-RightSignature::Template.prepackage(guid)
+@rs_connection.prepackage(guid)
 ```
 
 #####Template Prefilling
 After prepacking, the new template can be updated with prefill data. This won't send out the template as a document.
 ```
-RightSignature::Template.prefill(guid, subject, roles)
+@rs_connection.prefill(guid, subject, roles)
 ```
  * guid: template guid to use. Should be a template that was prepackaged
  * subject: document subject. 
@@ -271,14 +269,14 @@ options = {
   ],
   :callback_url => "http://yoursite/callback"
 }
-RightSignature::Template.prefill(guid, subject, roles, options)
+@rs_connection.prefill(guid, subject, roles, options)
 ```
 
 
 #####Template Sending
 Send template as a document for signing. Same options as prefill.
 ```
-RightSignature::Template.send_template(guid, subject, roles)
+@rs_connection.send_template(guid, subject, roles)
 ```
  * guid: template guid to use. Should be a template that was prepackaged
  * subject: document subject. 
@@ -308,14 +306,14 @@ options = {
   ],
   :callback_url => "http://yoursite/callback"
 }
-RightSignature::Template.send_template(guid, subject, roles, options)
+@rs_connection.send_template(guid, subject, roles, options)
 ```
 
 #####Embedded Signing Links for Sent Template
 Prepackages a template, and sends it out with each recipients marked as a embedded signer (email as noemail@rightsignature.com), then generates embedded signing URLs.
 Returns an array of {:name => "John Bellingham", "url" => "https://rightsignature.com/signatures/embedded?rt=1234"}
 ```
-RightSignature::Template.send_as_embedded_signers(guid, recipients, options={})
+@rs_connection.send_as_embedded_signers(guid, recipients, options={})
 ```
  * guid: guid of template to create document with
  * recipient: recipient names in array of {:name => "Person's Name"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name"}}
@@ -335,7 +333,7 @@ RightSignature::Template.send_as_embedded_signers(guid, recipients, options={})
 #####Create New Template Link
 Generate a url that let's someone upload and create a template under OAuth user's account.
 ```
-RightSignature::Template.generate_build_url
+@rs_connection.generate_build_url
 ```
 
 You can also add restrictions to what the person can do:
@@ -365,7 +363,7 @@ options = {
   :callback_location => "http://example.com/done_signing", 
   :redirect_location => "http://example.com/come_back_here"
 }
-RightSignature::Template.generate_build_url(options)
+@rs_connection.generate_build_url(options)
 ```
 
 
@@ -375,18 +373,18 @@ API calls involving API user's account.
 
 #####User Details
 ```
-RightSignature::Account.user_details
+@rs_connection.user_details
 ```
 
 #####Add User to Account
 ```
-RightSignature::Account.add_user(name, email)
+@rs_connection.add_user(name, email)
 ```
 
 #####Usage Report
 Returns number of documents sent. Can scope to week, month, or day and count only signed, unsigned, or all documents.
 ```
-RightSignature::Account.usage_report(since=nil, signed=nil)
+@rs_connection.usage_report(since=nil, signed=nil)
 ```
 * since: Only count documents sent withing the 'week', 'month', or 'day'.
 * signed: Only count signed documents if 'true', else all documents
@@ -397,7 +395,7 @@ Custom API calls using RightSignature::Connection
 In case there are new API paths, RightSignature::Connection allows a specific path to be specified.
 #####Ex. GET https://rightsignature.com/api/documents.xml
 ```
-RightSignature::Connection.get('/api/documents.xml', {:my => 'params'}, {'custom_header' => 'headerValue'})
+@rs_connection.get('/api/documents.xml', {:my => 'params'}, {'custom_header' => 'headerValue'})
 ```
 
 #####Ex. POST https://rightsignature.com/api/documents.xml
@@ -408,14 +406,14 @@ request_hash= {
     'document_data' => {:type => 'url', :value => 'http://localhost:3000/sub.pdf' }
   }
 }
-RightSignature::Connection.post('/api/documents.xml', request_hash, {'custom_header' => 'headerValue'})
+@rs_connection.post('/api/documents.xml', request_hash, {'custom_header' => 'headerValue'})
 ```
 
 Development Notes
 -----------------
 To load in irb from project root:
 ```
-$:.push File.expand_path("../lib", __FILE__); require "rightsignature"; RightSignature::load_configuration(MY_KEYS)
+$:.push File.expand_path("../lib", __FILE__); require "rightsignature"; RightSignature::Connection.new(MY_KEYS)
 ```
 
 TODO:

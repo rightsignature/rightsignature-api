@@ -3,19 +3,24 @@ module RightSignature
     include HTTParty
     base_uri 'https://rightsignature.com'
     format :xml
+    
+    attr_reader :api_token
 
-    class <<self
-      def request(method, url, options)
-        raise "Please set load_configuration with #{RightSignature::api_token_keys.join(', ')}" unless RightSignature::has_api_token?
-        
-        options[:headers] ||= {}
-        options[:headers]['api-token'] = RightSignature::configuration[:api_token]
-        options[:headers]["Accept"] ||= "*/*"
-        options[:headers]["content-type"] ||= "application/xml"
-        __send__(method, url, options)
-      end
-      
+    def initialize(api_token)
+      @api_token = api_token
     end
+    
 
+    def request(method, url, options)
+      raise "Please set api_token" if @api_token.nil? || @api_token.empty?
+      
+      options[:headers] ||= {}
+      options[:headers]['api-token'] = @api_token
+      options[:headers]["Accept"] ||= "*/*"
+      options[:headers]["content-type"] ||= "application/xml"
+      __send__(method, url, options)
+    end
+    
   end
+
 end
