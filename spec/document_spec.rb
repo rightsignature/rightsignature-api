@@ -1,94 +1,94 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
 describe RightSignature::Document do
-  describe "list" do
+  describe "documents_list" do
     it "should GET /documents.xml" do
-      RightSignature::Connection.should_receive(:get).with('/api/documents.xml', {})
-      RightSignature::Document.list
+      @rs.should_receive(:get).with('/api/documents.xml', {})
+      @rs.documents_list
     end
     
     it "should pass search options to /api/templates.xml" do
-      RightSignature::Connection.should_receive(:get).with('/api/documents.xml', {:search => "search", :page => 2})
-      RightSignature::Document.list(:search => "search", :page => 2)
+      @rs.should_receive(:get).with('/api/documents.xml', {:search => "search", :page => 2})
+      @rs.documents_list(:search => "search", :page => 2)
     end
 
     it "should convert array in options :tags into a string" do
-      RightSignature::Connection.should_receive(:get).with('/api/documents.xml', {:tags => "hello,what_is:up"})
-      RightSignature::Document.list(:tags => ['hello', {'what_is' => "up"}])
+      @rs.should_receive(:get).with('/api/documents.xml', {:tags => "hello,what_is:up"})
+      @rs.documents_list(:tags => ['hello', {'what_is' => "up"}])
     end
 
     it "should convert array of options :state into a string" do
-      RightSignature::Connection.should_receive(:get).with('/api/documents.xml', {:state => 'pending,trashed'})
-      RightSignature::Document.list(:state => ['pending', 'trashed'])
+      @rs.should_receive(:get).with('/api/documents.xml', {:state => 'pending,trashed'})
+      @rs.documents_list(:state => ['pending', 'trashed'])
     end
   end
   
   describe "details" do
     it "should GET /api/documentsMYGUID.xml" do
-      RightSignature::Connection.should_receive(:get).with('/api/documents/MYGUID.xml')
-      RightSignature::Document.details('MYGUID')
+      @rs.should_receive(:get).with('/api/documents/MYGUID.xml')
+      @rs.document_details('MYGUID')
     end
   end
   
   describe "details" do
     it "should GET /api/documentsMYGUID.xml" do
-      RightSignature::Connection.should_receive(:get).with('/api/documents/MYGUID.xml')
-      RightSignature::Document.details('MYGUID')
+      @rs.should_receive(:get).with('/api/documents/MYGUID.xml')
+      @rs.document_details('MYGUID')
     end
   end
 
-  describe "batch_details" do
+  describe "documents_batch_details" do
     it "should GET /api/documentsMYGUID1,MYGUID2.xml" do
-      RightSignature::Connection.should_receive(:get).with('/api/documents/MYGUID1,MYGUID2/batch_details.xml')
-      RightSignature::Document.batch_details(['MYGUID1','MYGUID2'])
+      @rs.should_receive(:get).with('/api/documents/MYGUID1,MYGUID2/batch_details.xml')
+      @rs.documents_batch_details(['MYGUID1','MYGUID2'])
     end
   end
 
   describe "send_reminder" do
     it "should POST /api/documentsMYGUID/send_reminders.xml" do
-      RightSignature::Connection.should_receive(:post).with('/api/documents/MYGUID/send_reminders.xml', {})
-      RightSignature::Document.send_reminder('MYGUID')
+      @rs.should_receive(:post).with('/api/documents/MYGUID/send_reminders.xml', {})
+      @rs.send_reminder('MYGUID')
     end
   end
   
   describe "trash" do
     it "should POST /api/documents/MYGUID/trash.xml" do
-      RightSignature::Connection.should_receive(:post).with('/api/documents/MYGUID/trash.xml', {})
-      RightSignature::Document.trash('MYGUID')
+      @rs.should_receive(:post).with('/api/documents/MYGUID/trash.xml', {})
+      @rs.trash_document('MYGUID')
     end
   end
   
-  describe "extend_expiration" do
+  describe "extend_document_expiration" do
     it "should POST /api/documents/MYGUID/extend_expiration.xml" do
-      RightSignature::Connection.should_receive(:post).with('/api/documents/MYGUID/extend_expiration.xml', {})
-      RightSignature::Document.extend_expiration('MYGUID')
+      @rs.should_receive(:post).with('/api/documents/MYGUID/extend_expiration.xml', {})
+      @rs.extend_document_expiration('MYGUID')
     end
   end
   
-  describe "update_tags" do
+  describe "update_document_tags" do
     it "should POST /api/documents/MYGUID/update_tags.xml" do
-      RightSignature::Connection.should_receive(:post).with('/api/documents/MYGUID/update_tags.xml', {:tags => []})
-      RightSignature::Document.update_tags('MYGUID', [])
+      @rs.should_receive(:post).with('/api/documents/MYGUID/update_tags.xml', {:tags => []})
+      @rs.update_document_tags('MYGUID', [])
     end
 
     it "should normalize tags array into expected hash format" do
-      RightSignature::Connection.should_receive(:post).with('/api/documents/MYGUID/update_tags.xml', {
+      @rs.should_receive(:post).with('/api/documents/MYGUID/update_tags.xml', {
         :tags => [{:tag => {:name => 'myNewOne'}}, {:tag => {:name => 'should_replace', :value => 'the_old_new'}}]
       })
-      RightSignature::Document.update_tags('MYGUID', ["myNewOne", {"should_replace" => "the_old_new"}])
+      @rs.update_document_tags('MYGUID', ["myNewOne", {"should_replace" => "the_old_new"}])
     end
 
     it "should allow empty tags array" do
-      RightSignature::Connection.should_receive(:post).with('/api/documents/MYGUID/update_tags.xml', {
+      @rs.should_receive(:post).with('/api/documents/MYGUID/update_tags.xml', {
         :tags => []
       })
-      RightSignature::Document.update_tags('MYGUID', [])
+      @rs.update_document_tags('MYGUID', [])
     end
   end
 
   describe "send_document" do
     it "should POST /api/documents.xml with document hash containing given subject, document data, recipients, and action of 'send'" do
-      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+      @rs.should_receive(:post).with("/api/documents.xml", {
         :document => {
           :subject => "subby",
           :document_data => {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"},
@@ -97,11 +97,11 @@ describe RightSignature::Document do
         }
       })
       document_data = {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"}
-      RightSignature::Document.send_document("subby", [], document_data)
+      @rs.send_document("subby", [], document_data)
     end
 
     it "should POST /api/documents.xml should convert recipients into normalized format" do
-      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+      @rs.should_receive(:post).with("/api/documents.xml", {
         :document => {
           :subject => "subby",
           :document_data => {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"},
@@ -115,11 +115,11 @@ describe RightSignature::Document do
       document_data = {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"}
       recipients = [{:name => "Signy Sign", :email => "signy@example.com", :role => "signer"}, {:name => "Cee Cee", :email => "ccme@example.com", :role => "cc"}]
 
-      RightSignature::Document.send_document("subby", recipients, document_data)
+      @rs.send_document("subby", recipients, document_data)
     end
 
     it "should POST /api/documents.xml with options" do
-      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+      @rs.should_receive(:post).with("/api/documents.xml", {
         :document => {
           :subject => "subby",
           :document_data => {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"},
@@ -139,13 +139,13 @@ describe RightSignature::Document do
         :description => "My descript",
         :callback_url => "http://example.com/call"
       }
-      RightSignature::Document.send_document("subby", recipients, document_data, options)
+      @rs.send_document("subby", recipients, document_data, options)
     end
   end
   
   describe "send_document_from_data" do
     it "should POST /api/documents.xml with document hash containing given subject, Base64 encoded version of document data, recipients, and action of 'send'" do
-      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+      @rs.should_receive(:post).with("/api/documents.xml", {
         :document => {
           :subject => "subby",
           :document_data => {:type => 'base64', :filename => "my fresh upload.pdf", :value => Base64::encode64("THIS IS MY data")},
@@ -153,11 +153,11 @@ describe RightSignature::Document do
           :action => "send"
         }
       })
-      RightSignature::Document.send_document_from_data("THIS IS MY data", "my fresh upload.pdf", "subby", [])
+      @rs.send_document_from_data("THIS IS MY data", "my fresh upload.pdf", "subby", [])
     end
 
     it "should POST /api/documents.xml with options" do
-      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+      @rs.should_receive(:post).with("/api/documents.xml", {
         :document => {
           :subject => "subby",
           :action => "send",
@@ -176,7 +176,7 @@ describe RightSignature::Document do
         :description => "My descript",
         :callback_url => "http://example.com/call"
       }
-      RightSignature::Document.send_document_from_data("THIS", "uploaded.pdf", "subby", recipients, options)
+      @rs.send_document_from_data("THIS", "uploaded.pdf", "subby", recipients, options)
     end
   end
   
@@ -186,7 +186,7 @@ describe RightSignature::Document do
       file = File.new(File.dirname(__FILE__) + '/spec_helper.rb')
       fake_data = "abc"
       File.should_receive(:read).with(file).and_return(fake_data)
-      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+      @rs.should_receive(:post).with("/api/documents.xml", {
         :document => {
           :subject => "subby",
           :action => "send",
@@ -195,14 +195,14 @@ describe RightSignature::Document do
         }
       })
 
-      RightSignature::Document.send_document_from_file(file, "subby", [])
+      @rs.send_document_from_file(file, "subby", [])
     end
 
     it "should open path to file and base64 encode it" do
       file_path = '/tmp/temp.pdf'
       fake_data = "abc"
       File.should_receive(:read).with(file_path).and_return(fake_data)
-      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+      @rs.should_receive(:post).with("/api/documents.xml", {
         :document => {
           :subject => "subby",
           :action => "send",
@@ -210,14 +210,14 @@ describe RightSignature::Document do
           :recipients => []
         }
       })
-      RightSignature::Document.send_document_from_file(file_path, "subby", [])
+      @rs.send_document_from_file(file_path, "subby", [])
     end
 
     it "should POST /api/documents.xml with options" do
       file_path = '/tmp/temp.pdf'
       fake_data = "abc"
       File.should_receive(:read).with(file_path).and_return(fake_data)
-      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+      @rs.should_receive(:post).with("/api/documents.xml", {
         :document => {
           :subject => "subby",
           :action => "send",
@@ -236,13 +236,13 @@ describe RightSignature::Document do
         :description => "My descript",
         :callback_url => "http://example.com/call"
       }
-      RightSignature::Document.send_document_from_file(file_path, "subby", recipients, options)
+      @rs.send_document_from_file(file_path, "subby", recipients, options)
     end
   end
   
   describe "generate_document_url" do
     it "should POST /api/documents.xml with redirect action and return https://rightsignature.com/builder/new?rt=REDIRECT_TOKEN" do
-      RightSignature::Connection.should_receive(:post).with("/api/documents.xml", {
+      @rs.should_receive(:post).with("/api/documents.xml", {
         :document => {
           :subject => "subjy",
           :action => "redirect",
@@ -250,45 +250,45 @@ describe RightSignature::Document do
           :recipients => [],
         }
       }).and_return({"document"=>{"redirect_token" => "REDIRECT_TOKEN"}})
-      RightSignature::Document.generate_document_redirect_url("subjy", [], {}).should == "#{RightSignature::Connection.site}/builder/new?rt=REDIRECT_TOKEN"
+      @rs.generate_document_redirect_url("subjy", [], {}).should == "#{@rs.site}/builder/new?rt=REDIRECT_TOKEN"
     end
   end
   
-  describe "get_signer_links_for" do
+  describe "get_document_signer_links_for" do
     it "should GET /api/documents/GUID123/signer_links.xml and return urls for signers" do
-      RightSignature::Connection.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {}).and_return({'document' => {'signer_links' => {'signer_link' => [
+      @rs.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {}).and_return({'document' => {'signer_links' => {'signer_link' => [
         {"signer_token" => "avx37", "name" => "John Bellingham"}, 
         {"signer_token" => "fdh89", "name" => "Righty Jones"}]
       }}})
       
-      response = RightSignature::Document.get_signer_links_for("GUID123")
+      response = @rs.get_document_signer_links_for("GUID123")
       response.size.should == 2
-      response.include?({"name" => "John Bellingham", "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=avx37"}).should be_true
-      response.include?({"name" => "Righty Jones", "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=fdh89"}).should be_true
+      response.include?({"name" => "John Bellingham", "url" => "#{@rs.site}/signatures/embedded?rt=avx37"}).should be_true
+      response.include?({"name" => "Righty Jones", "url" => "#{@rs.site}/signatures/embedded?rt=fdh89"}).should be_true
     end
 
     it "should GET /api/documents/GUID123/signer_links.xml with URI encoded redirect location and return urls for signers" do
-      RightSignature::Connection.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {:redirect_location => "http://google.com/redirected%20location"}
+      @rs.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {:redirect_location => "http://google.com/redirected%20location"}
       ).and_return({'document' => {'signer_links' => {'signer_link' => [
         {"signer_token" => "avx37", "name" => "John Bellingham"}, 
         {"signer_token" => "fdh89", "name" => "Righty Jones"}]
       }}})
       
-      response = RightSignature::Document.get_signer_links_for("GUID123", "http://google.com/redirected location")
+      response = @rs.get_document_signer_links_for("GUID123", "http://google.com/redirected location")
       response.size.should == 2
-      response.include?({"name" => "John Bellingham", "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=avx37"}).should be_true
-      response.include?({"name" => "Righty Jones", "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=fdh89"}).should be_true
+      response.include?({"name" => "John Bellingham", "url" => "#{@rs.site}/signatures/embedded?rt=avx37"}).should be_true
+      response.include?({"name" => "Righty Jones", "url" => "#{@rs.site}/signatures/embedded?rt=fdh89"}).should be_true
     end
 
     it "should GET /api/documents/GUID123/signer_links.xml with URI encoded redirect location and return urls for 1 signer_link" do
-      RightSignature::Connection.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {:redirect_location => "http://google.com/redirected%20location"}
+      @rs.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {:redirect_location => "http://google.com/redirected%20location"}
       ).and_return({'document' => {'signer_links' => {'signer_link' => 
         {"signer_token" => "fdh89", "name" => "Righty Jones"}
       }}})
       
-      response = RightSignature::Document.get_signer_links_for("GUID123", "http://google.com/redirected location")
+      response = @rs.get_document_signer_links_for("GUID123", "http://google.com/redirected location")
       response.size.should == 1
-      response.include?({"name" => "Righty Jones", "url" => "#{RightSignature::Connection.site}/signatures/embedded?rt=fdh89"}).should be_true
+      response.include?({"name" => "Righty Jones", "url" => "#{@rs.site}/signatures/embedded?rt=fdh89"}).should be_true
     end
   end
 end
