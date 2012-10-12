@@ -1,14 +1,24 @@
 module RightSignature
   module Template
     include RightSignature::Helpers
-    # List Templates and passes in optional options.
-    #  Options:
-    #   * page: page number
-    #   * per_page: number of templates to return per page. 
-    #       API only supports 10, 20, 30, 40, or 50. Default is 10.
-    #   * tags: filter templates by given tags. Array of strings, for name/value tags colon (:) should separate name and value.
-    #       Ex. "single_tag,tag_key:tag_value" would find templates with 'single_tag' and the name/value of 'tag_key' with value 'tag_value'.
-    #   * search: term to search for in templates.
+    # List Templates with optional filters
+    # * <b>Options</b>: (optional) Hash of filters to use
+    #   * <b>page</b>: page number
+    #   * <b>per_page</b>: number of templates to return per page. 
+    #     API only supports 10, 20, 30, 40, or 50. Default is 10.
+    #   * <b>tags</b>: filter templates by given tags. Array of strings, for name/value tags colon (:) should separate name and value.
+    #     Ex. "single_tag,tag_key:tag_value" would find templates with 'single_tag' and the name/value of 'tag_key' with value 'tag_value'.
+    #   * <b>search</b>: term to search for in templates.
+    # 
+    # Ex. 
+    #   options = {
+    #     :state => ['completed', 'trashed'],
+    #     :page => 1,
+    #     :per_page => 20,
+    #     :search => "me",
+    #     :tags => ["single_tag", "key" => "with_value"]
+    #   }
+    #   @rs_connection.templates_list(options)
     def templates_list(options={})
       options[:tags] = TagsHelper.mixed_array_to_string_array(options[:tags]) if options[:tags]
       get "/api/templates.xml", options
@@ -34,18 +44,18 @@ module RightSignature
     #           <email>john@employee.com</email>
     #         </role>
     # * options: other optional values
-    #     - description: document description that'll appear in the email
-    #     - merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
-    #         Ex. [{"Salary" => "$1,000,000"}]
-    #           is equivalent to 
-    #             <merge_field merge_field_name="Salary">
-    #             <value>$1,000,000</value>
-    #             </merge_field>
-    #     - expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
-    #     - tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
-    #         Ex. ['sent_from_api', {"user_id" => "32"}]
-    #     - callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
-    #         Ex. "http://yoursite/callback"
+    #   * description: document description that'll appear in the email
+    #   * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+    #       Ex. [{"Salary" => "$1,000,000"}]
+    #         is equivalent to 
+    #           <merge_field merge_field_name="Salary">
+    #           <value>$1,000,000</value>
+    #           </merge_field>
+    #   * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
+    #   * tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
+    #       Ex. ['sent_from_api', {"user_id" => "32"}]
+    #   * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #       Ex. "http://yoursite/callback"
     # 
     # Ex. call with all options used
     #   RightSignature::Template.prefill(
@@ -104,18 +114,18 @@ module RightSignature
     #           <email>john@employee.com</email>
     #         </role>
     # * options: other optional values
-    #     - description: document description that'll appear in the email
-    #     - merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
-    #         Ex. [{"Salary" => "$1,000,000"}]
-    #           is equivalent to 
-    #             <merge_field merge_field_name="Salary">
-    #             <value>$1,000,000</value>
-    #             </merge_field>
-    #     - expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
-    #     - tags: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
-    #         Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
-    #     - callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
-    #         Ex. "http://yoursite/callback"
+    #   * description: document description that'll appear in the email
+    #   * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+    #       Ex. [{"Salary" => "$1,000,000"}]
+    #         is equivalent to 
+    #           <merge_field merge_field_name="Salary">
+    #           <value>$1,000,000</value>
+    #           </merge_field>
+    #   * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
+    #   * tags: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
+    #       Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
+    #   * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #       Ex. "http://yoursite/callback"
     # 
     # Ex. call with all options used
     #   RightSignature::Template.prefill(
@@ -141,16 +151,16 @@ module RightSignature
     
     # Creates a URL that give person ability to create a template in your account.
     # * options: optional options for redirected person
-    #     - callback_location: URI encoded URL that specifies the location we will POST a callback notification to when the template has been created.
-    #     - redirect_location: A URI encoded URL that specifies the location we will redirect the user to, after they have created a template.
-    #     - tags: tags to add to the template. an array of 'tag_name' (for simple tag) or {'tag_name' => 'value'} (for tuples pairs)
-    #         Ex. ['created_from_api', {"user_id" => "123"}]
-    #     - acceptable_role_names: The user creating the Template will be forced to select one of the values provided. 
-    #         There will be no free-form name entry when adding roles to the Template. An array of strings. 
-    #         Ex. ["Employee", "Employeer"]
-    #     - acceptable_merge_field_names: The user creating the Template will be forced to select one of the values provided. 
-    #         There will be no free-form name entry when adding merge fields to the Template.
-    #         Ex. ["Location", "Tax ID", "Company Name"]
+    #   * callback_location: URI encoded URL that specifies the location we will POST a callback notification to when the template has been created.
+    #   * redirect_location: A URI encoded URL that specifies the location we will redirect the user to, after they have created a template.
+    #   * tags: tags to add to the template. an array of 'tag_name' (for simple tag) or {'tag_name' => 'value'} (for tuples pairs)
+    #       Ex. ['created_from_api', {"user_id" => "123"}]
+    #   * acceptable_role_names: The user creating the Template will be forced to select one of the values provided. 
+    #       There will be no free-form name entry when adding roles to the Template. An array of strings. 
+    #       Ex. ["Employee", "Employeer"]
+    #   * acceptable_merge_field_names: The user creating the Template will be forced to select one of the values provided. 
+    #       There will be no free-form name entry when adding merge fields to the Template.
+    #       Ex. ["Location", "Tax ID", "Company Name"]
     def generate_build_url(options={})
       xml_hash = {:template => {}}
       xml_hash[:template][:tags] = TagsHelper.array_to_xml_hash(options[:tags]) if options[:tags]
@@ -180,21 +190,21 @@ module RightSignature
     #           <email>noemail@rightsignature.com</email>
     #         </role>
     # * options: other optional values
-    #     - subject: subject of the document that'll appear in email. Defaults to Template's subject
-    #     - description: document description that'll appear in the email
-    #     - merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
-    #         Ex. [{"Salary" => "$1,000,000"}]
-    #           is equivalent to 
-    #             <merge_field merge_field_name="Salary">
-    #             <value>$1,000,000</value>
-    #             </merge_field>
-    #     - expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
-    #     - tags: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
-    #         Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
-    #     - callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
-    #         Ex. "http://yoursite/callback"
-    #     - redirect_location: A URI encoded URL that specifies the location for the signing widget to redirect the user to after it is signed. 
-    #         Ex. "http://yoursite/thanks_for_signing"
+    #   * subject: subject of the document that'll appear in email. Defaults to Template's subject
+    #   * description: document description that'll appear in the email
+    #   * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+    #       Ex. [{"Salary" => "$1,000,000"}]
+    #         is equivalent to 
+    #           <merge_field merge_field_name="Salary">
+    #           <value>$1,000,000</value>
+    #           </merge_field>
+    #   * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
+    #   * tags: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
+    #       Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
+    #   * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #       Ex. "http://yoursite/callback"
+    #   * redirect_location: A URI encoded URL that specifies the location for the signing widget to redirect the user to after it is signed. 
+    #       Ex. "http://yoursite/thanks_for_signing"
     # 
     # Ex. call with all options used
     #   RightSignature::Template.prefill(
