@@ -1,6 +1,6 @@
-module RightSignature::Helpers
-  module TagsHelper
-    class <<self
+module RightSignature::Helpers #:nodoc:
+  module TagsHelper #:nodoc: 
+    class <<self #:nodoc: 
       def mixed_array_to_string_array(array_of_tags)
         return array_of_tags unless array_of_tags.is_a?(Array)
   
@@ -32,8 +32,8 @@ module RightSignature::Helpers
     end
   end
   
-  module RolesHelper
-    class <<self
+  module RolesHelper #:nodoc: 
+    class <<self #:nodoc: 
       # Converts [{"Role_ID" => {:name => "John", :email => "email@example.com"}}] to 
       #   [{:role => {:name => "John", :email => "email@example.com", "@role_id" => "Role_ID"} }]
       # Tries to guess if it's using Role ID or Role Name
@@ -56,8 +56,8 @@ module RightSignature::Helpers
   end
 
   
-  module MergeFieldsHelper
-    class <<self
+  module MergeFieldsHelper #:nodoc: 
+    class <<self #:nodoc:
       # Converts [{"Role Name" => {:name => "John", :email => "email@example.com"}}] to 
       #   [{"role roles_name=\"Role Name\"" => {:role => {:name => "John", :email => "email@example.com"}} }]
       def array_to_xml_hash(merge_fields_array, use_id=false)
@@ -77,6 +77,7 @@ module RightSignature::Helpers
     end
   end
   
+   #:nodoc: 
   def array_to_acceptable_names_hash(acceptable_names)
     converted_fields = []
     acceptable_names.each do |name|

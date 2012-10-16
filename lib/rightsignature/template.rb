@@ -24,37 +24,40 @@ module RightSignature
       get "/api/templates.xml", options
     end
     
+    # Gets template details
+    # * <b>guid</b>: templates guid. Ex. a_1_zcfdidf8fi23
     def template_details(guid)
       get "/api/templates/#{guid}.xml", {}
     end
     
-    # Clones a template so it can be used for sending. Always first step in sending a template.
+    # Clones a template so it can be used for sending. Always first step in sending a template. 
+    # * <b>guid</b>: templates guid. Ex. a_1_zcfdidf8fi23
     def prepackage(guid)
       post "/api/templates/#{guid}/prepackage.xml", {}
     end
     
-    # Prefills template.
-    # * guid: templates guid. Ex. a_1_zcfdidf8fi23
-    # * subject: subject of the document that'll appear in email
-    # * roles: Recipients of the document, should be an array of role names and emails in a hash with keys as role_names. 
+    # Prefills template. Should use a <b>prepackaged</b> template first.
+    # * <b>guid</b>: templates guid. Ex. a_1_zcfdidf8fi23
+    # * <b>subject</b>: subject of the document that'll appear in email
+    # * <b>roles</b>: Recipients of the document, should be an array of role names and emails in a hash with keys as role_names. 
     #     Ex. [{"Employee" => {:name => "John Employee", :email => "john@employee.com"}}]
     #       is equivalent to 
     #         <role role_name="Employee">
     #           <name>John Employee</name>
     #           <email>john@employee.com</email>
     #         </role>
-    # * options: other optional values
-    #   * description: document description that'll appear in the email
-    #   * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+    # * <b>options</b>: other optional values
+    #   * <b>description</b>: document description that'll appear in the email
+    #   * <b>merge_fields</b>: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
     #       Ex. [{"Salary" => "$1,000,000"}]
     #         is equivalent to 
     #           <merge_field merge_field_name="Salary">
     #           <value>$1,000,000</value>
     #           </merge_field>
-    #   * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
-    #   * tags: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
+    #   * <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
+    #   * <b>tags</b>: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
     #       Ex. ['sent_from_api', {"user_id" => "32"}]
-    #   * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   * <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #       Ex. "http://yoursite/callback"
     # 
     # Ex. call with all options used
@@ -97,38 +100,80 @@ module RightSignature
       post "/api/templates.xml", xml_hash
     end
     
-    def prepackage_and_send(guid, roles, options={})
-      response = prepackage(guid)
-      new_guid = response["template"]["guid"]
-      send_template(new_guid, options.delete(:subject) || response["template"]["subject"], roles, options)
-    end
-    
-    # Sends template.
-    # * guid: templates guid. Ex. a_1_zcfdidf8fi23
-    # * subject: subject of the document that'll appear in email
-    # * roles: Recipients of the document, should be an array of role names and emails in a hash with keys as role_names. 
+    # Prepackages and sends template.
+    # * <b>guid</b>: templates guid. Ex. a_1_zcfdidf8fi23
+    # * <b>roles</b>: Recipients of the document, should be an array of role names and emails in a hash with keys as role_names. 
     #     Ex. [{"Employee" => {:name => "John Employee", :email => "john@employee.com"}}]
     #       is equivalent to 
     #         <role role_name="Employee">
     #           <name>John Employee</name>
     #           <email>john@employee.com</email>
     #         </role>
-    # * options: other optional values
-    #   * description: document description that'll appear in the email
-    #   * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+    # * <b>options</b>: other optional values
+    #   * <b>subject</b>: subject of the document that'll appear in email. Defaults to template's subject
+    #   * <b>description</b>: document description that'll appear in the email
+    #   * <b>merge_fields</b>: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
     #       Ex. [{"Salary" => "$1,000,000"}]
     #         is equivalent to 
     #           <merge_field merge_field_name="Salary">
     #           <value>$1,000,000</value>
     #           </merge_field>
-    #   * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
-    #   * tags: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
+    #   * <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
+    #   * <b>tags</b>: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
     #       Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
-    #   * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   * <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #       Ex. "http://yoursite/callback"
     # 
     # Ex. call with all options used
-    #   RightSignature::Template.prefill(
+    #   RightSignature::Template.prepackage_and_send(
+    #     "a_1_zcfdidf8fi23", 
+    #     "Your Employee Handbook", 
+    #     [{"employee" => {:name => "John Employee", :email => "john@employee.com"}}],
+    #     {
+    #       :description => "Please read over the handbook and sign it.",
+    #       :merge_fields => [
+    #         { "Department" => "Fun and games" },
+    #         { "Salary" => "$1,000,000" }
+    #       ],
+    #       :expires_in => 5,
+    #       :tags => [
+    #         {:name => 'sent_from_api'},
+    #         {:name => 'user_id', :value => '32'}
+    #       ],
+    #       :callback_url => "http://yoursite/callback"
+    #     })
+    def prepackage_and_send(guid, roles, options={})
+      response = prepackage(guid)
+      new_guid = response["template"]["guid"]
+      send_template(new_guid, options.delete(:subject) || response["template"]["subject"], roles, options)
+    end
+    
+    # Sends template. Should use a <b>prepackaged</b> template first. Easier to use <b>prepackage_and_send</b> for most cases.
+    # * <b>guid</b>: templates guid. Ex. a_1_zcfdidf8fi23
+    # * <b>subject</b>: subject of the document that'll appear in email
+    # * <b>roles</b>: Recipients of the document, should be an array of role names and emails in a hash with keys as role_names. 
+    #     Ex. [{"Employee" => {:name => "John Employee", :email => "john@employee.com"}}]
+    #       is equivalent to 
+    #         <role role_name="Employee">
+    #           <name>John Employee</name>
+    #           <email>john@employee.com</email>
+    #         </role>
+    # * <b>options</b>: other optional values
+    #   * <b>description</b>: document description that'll appear in the email
+    #   * <b>merge_fields</b>: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+    #       Ex. [{"Salary" => "$1,000,000"}]
+    #         is equivalent to 
+    #           <merge_field merge_field_name="Salary">
+    #           <value>$1,000,000</value>
+    #           </merge_field>
+    #   * <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
+    #   * <b>tags</b>: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
+    #       Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
+    #   * <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #       Ex. "http://yoursite/callback"
+    # 
+    # Ex. call with all options used
+    #   RightSignature::Template.send_template(
     #     "a_1_zcfdidf8fi23", 
     #     "Your Employee Handbook", 
     #     [{"employee" => {:name => "John Employee", :email => "john@employee.com"}}],
@@ -150,15 +195,15 @@ module RightSignature
     end
     
     # Creates a URL that give person ability to create a template in your account.
-    # * options: optional options for redirected person
-    #   * callback_location: URI encoded URL that specifies the location we will POST a callback notification to when the template has been created.
-    #   * redirect_location: A URI encoded URL that specifies the location we will redirect the user to, after they have created a template.
-    #   * tags: tags to add to the template. an array of 'tag_name' (for simple tag) or {'tag_name' => 'value'} (for tuples pairs)
+    # * <b>options</b>: optional options for redirected person
+    #   * <b>callback_location</b>: URI encoded URL that specifies the location we will POST a callback notification to when the template has been created.
+    #   * <b>redirect_location</b>: A URI encoded URL that specifies the location we will redirect the user to, after they have created a template.
+    #   * <b>tags</b>: tags to add to the template. an array of 'tag_name' (for simple tag) or {'tag_name' => 'value'} (for tuples pairs)
     #       Ex. ['created_from_api', {"user_id" => "123"}]
-    #   * acceptable_role_names: The user creating the Template will be forced to select one of the values provided. 
+    #   * <b>acceptable_role_names</b>: The user creating the Template will be forced to select one of the values provided. 
     #       There will be no free-form name entry when adding roles to the Template. An array of strings. 
     #       Ex. ["Employee", "Employeer"]
-    #   * acceptable_merge_field_names: The user creating the Template will be forced to select one of the values provided. 
+    #   * <b>acceptable_merge_field_names</b>: The user creating the Template will be forced to select one of the values provided. 
     #       There will be no free-form name entry when adding merge fields to the Template.
     #       Ex. ["Location", "Tax ID", "Company Name"]
     def generate_build_url(options={})
@@ -181,29 +226,29 @@ module RightSignature
     end
     
     # Sends template with all roles as embedded signers and returns an array of hashes with :name and :url for each signer link.
-    # * guid: templates guid. Ex. a_1_zcfdidf8fi23
-    # * roles: Recipients of the document, should be an array of role names in a hash with keys as role_names. 
+    # * <b>guid</b>: templates guid. Ex. a_1_zcfdidf8fi23
+    # * <b>roles</b>: Recipients of the document, should be an array of role names in a hash with keys as role_names. 
     #     Ex. [{"Employee" => {:name => "John Employee"}]
     #       is equivalent to 
     #         <role role_name="Employee">
     #           <name>John Employee</name>
     #           <email>noemail@rightsignature.com</email>
     #         </role>
-    # * options: other optional values
-    #   * subject: subject of the document that'll appear in email. Defaults to Template's subject
-    #   * description: document description that'll appear in the email
-    #   * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
+    # * <b>options</b>: other optional values
+    #   * <b>subject</b>: subject of the document that'll appear in email. Defaults to Template's subject
+    #   * <b>description</b>: document description that'll appear in the email
+    #   * <b>merge_fields</b>: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
     #       Ex. [{"Salary" => "$1,000,000"}]
     #         is equivalent to 
     #           <merge_field merge_field_name="Salary">
     #           <value>$1,000,000</value>
     #           </merge_field>
-    #   * expires_in: number of days before expiring the document. API only allows 2,5,15, or 30.
-    #   * tags: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
+    #   * <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
+    #   * <b>tags</b>: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
     #       Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
-    #   * callback_url: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   * <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #       Ex. "http://yoursite/callback"
-    #   * redirect_location: A URI encoded URL that specifies the location for the signing widget to redirect the user to after it is signed. 
+    #   * <b>redirect_location</b>: A URI encoded URL that specifies the location for the signing widget to redirect the user to after it is signed. 
     #       Ex. "http://yoursite/thanks_for_signing"
     # 
     # Ex. call with all options used
