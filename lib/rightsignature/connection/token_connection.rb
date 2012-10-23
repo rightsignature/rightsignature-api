@@ -28,7 +28,7 @@ module RightSignature
       options[:headers]['api-token'] = @api_token
       options[:headers]["Accept"] ||= "*/*"
       options[:headers]["content-type"] ||= "application/xml"
-      __send__(method, url, options)
+      self.class.__send__(method, url, options)
     end
     
   end
