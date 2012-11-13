@@ -58,6 +58,14 @@ module RightSignature
     def new_request_token
       @request_token = oauth_consumer.get_request_token
     end
+
+    # Sets request token.
+    # * <b>request_token</b>: request token key
+    # * <b>request_token_secret</b>: request token secret
+    # 
+    def set_request_token(request_token, request_token_secret)
+      @request_token = OAuth::RequestToken.new(oauth_consumer, request_token, request_token_secret)
+    end
     
     # Uses request token and given OAuth verifier to generate an access token. Requires a request token to be set.
     # * <b>oauth_verifier</b>: OAuth verifier

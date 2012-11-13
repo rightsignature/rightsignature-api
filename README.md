@@ -39,14 +39,14 @@ request_token = @rs_connection.new_request_token
 
 Now Visit the url generated from
 ```
-@rs_oauth = RightSignature::OauthConnection.new(@rs_connection)
+@rs_oauth = @rs_connection.oauth_connection
 @rs_oauth.request_token.authorize_url
 ```
 and log into the site.
 
 After approving the application, you will be redirected to the callback url that is in the RightSignature API settings (https://rightsignature.com/oauth_clients). The OAuth verifier should be in the params "oauth_verifier". Put the verifier in:
 ```
-@rs_oauth = RightSignature::OauthConnection.new(@rs_connection)
+@rs_oauth = @rs_connection.oauth_connection
 @rs_oauth.generate_access_token(params[:oauth_verifer])
 ```
 
@@ -60,6 +60,11 @@ Will give you the Access Token's token and secret.
 You can also load the Access Token and Secret by calling
 ```
 @rs_oauth.set_access_token(token, secret)
+```
+
+If you need to set the Request Token for the OAuth Consumer:
+```
+@rs_oauth.set_request_token(token, secret)
 ```
 
 After loading the configuration, you can use wrappers in RightSignature::Connection to call the API, or use RightSignature::Connection for more custom calls.

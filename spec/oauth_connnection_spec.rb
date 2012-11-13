@@ -77,6 +77,15 @@ describe RightSignature::OauthConnection do
     end
   end
 
+  describe "set_request_token" do
+    it "should create RequestToken with given token and secret" do
+      oauth_connection = RightSignature::OauthConnection.new({:consumer_key => "Consumer123", :consumer_secret => "Secret098"})
+      oauth_connection.set_request_token('request1', 'secret2')
+      oauth_connection.request_token.token.should == 'request1'
+      oauth_connection.request_token.secret.should == 'secret2'
+    end
+  end
+
   describe "generate_access_token" do
     before do
       @oauth_connection = RightSignature::OauthConnection.new({:consumer_key => "Consumer123", :consumer_secret => "Secret098"})
