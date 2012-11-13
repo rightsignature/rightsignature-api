@@ -222,7 +222,7 @@ Most common use of API, clones a template and sends it for signature.
 @rs_connection.prepackage_and_send(guid, roles, options={})
 ```
  * guid: template guid to use. Should be a template that was prepackaged
- * roles: recipient names in array of {:name => "Person's Name", :email => "Email"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name", :name => "a@example.com"}}
+ * roles: recipient names in array of {:name => "Person's Name", :email => "Email"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name", :email => "a@example.com"}}
 Optional options:
  * subject: document subject. Defaults to the subject in prepackage response.
  * description: document description that'll appear in the email
@@ -244,11 +244,11 @@ For cloning a Template before sending it.
 #####Template Prefilling
 After prepacking, the new template can be updated with prefill data. This won't send out the template as a document.
 ```
-@rs_connection.prefill(guid, subject, roles)
+@rs_connection.prefill(guid, subject, roles, options={})
 ```
  * guid: template guid to use. Should be a template that was prepackaged
  * subject: document subject. 
- * roles: recipient names in array of {:name => "Person's Name", :email => "Email"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name", :name => "a@example.com"}}
+ * roles: recipient names in array of {:name => "Person's Name", :email => "Email"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name", :email => "a@example.com"}}
  * Optional options:
    * description: document description that'll appear in the email
    * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
@@ -281,11 +281,11 @@ options = {
 #####Template Sending
 Send template as a document for signing. Same options as prefill.
 ```
-@rs_connection.send_template(guid, subject, roles)
+@rs_connection.send_template(guid, subject, roles, options={})
 ```
  * guid: template guid to use. Should be a template that was prepackaged
  * subject: document subject. 
- * roles: recipient names in array of {:name => "Person's Name", :email => "Email"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name", :name => "a@example.com"}}
+ * roles: recipient names in array of {:name => "Person's Name", :email => "Email"} hashed by Role ID. Ex. {"signer_A" => {:name => "Your Name", :email => "a@example.com"}}
  * Optional options:
    * description: document description that'll appear in the email
    * merge_fields: document merge fields, should be an array of merge_field_values in a hash with the merge_field_name.
