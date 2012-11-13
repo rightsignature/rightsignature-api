@@ -57,7 +57,7 @@ module RightSignature
     #   * <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
     #   * <b>tags</b>: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
     #       Ex. ['sent_from_api', {"user_id" => "32"}]
-    #   * <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   * <b>callback_location</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #       Ex. "http://yoursite/callback"
     # 
     # Ex. call with all options used
@@ -76,7 +76,7 @@ module RightSignature
     #         {:name => 'sent_from_api'},
     #         {:name => 'user_id', :value => '32'}
     #       ],
-    #       :callback_url => "http://yoursite/callback"
+    #       :callback_location => "http://yoursite/callback"
     #     })
     def prefill(guid, subject, roles, options={})
       xml_hash = {
@@ -93,7 +93,7 @@ module RightSignature
       use_merge_field_ids = options.delete(:use_merge_field_ids)
       xml_hash[:template][:merge_fields] = MergeFieldsHelper.array_to_xml_hash(options[:merge_fields], use_merge_field_ids) if options[:merge_fields]
       xml_hash[:template][:tags] = TagsHelper.array_to_xml_hash(options[:tags]) if options[:tags]
-      [:expires_in, :description, :callback_url, :action].each do |other_option|
+      [:expires_in, :description, :callback_location, :action].each do |other_option|
         xml_hash[:template][other_option] = options[other_option] if options[other_option]
       end
 
@@ -121,7 +121,7 @@ module RightSignature
     #   * <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
     #   * <b>tags</b>: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
     #       Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
-    #   * <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   * <b>callback_location</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #       Ex. "http://yoursite/callback"
     # 
     # Ex. call with all options used
@@ -140,7 +140,7 @@ module RightSignature
     #         {:name => 'sent_from_api'},
     #         {:name => 'user_id', :value => '32'}
     #       ],
-    #       :callback_url => "http://yoursite/callback"
+    #       :callback_location => "http://yoursite/callback"
     #     })
     def prepackage_and_send(guid, roles, options={})
       response = prepackage(guid)
@@ -169,7 +169,7 @@ module RightSignature
     #   * <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
     #   * <b>tags</b>: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
     #       Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
-    #   * <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   * <b>callback_location</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #       Ex. "http://yoursite/callback"
     # 
     # Ex. call with all options used
@@ -188,7 +188,7 @@ module RightSignature
     #         {:name => 'sent_from_api'},
     #         {:name => 'user_id', :value => '32'}
     #       ],
-    #       :callback_url => "http://yoursite/callback"
+    #       :callback_location => "http://yoursite/callback"
     #     })
     def send_template(guid, subject, roles, options={})
       prefill(guid, subject, roles, options.merge({:action => 'send'}))
@@ -246,7 +246,7 @@ module RightSignature
     #   * <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
     #   * <b>tags</b>: document tags, an array of {:name => 'tag_name'} (for simple tag) or {:name => 'tag_name', :value => 'value'} (for tuples pairs)
     #       Ex. [{:name => 'sent_from_api'}, {:name => "user_id", :value => "32"}]
-    #   * <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   * <b>callback_location</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #       Ex. "http://yoursite/callback"
     #   * <b>redirect_location</b>: A URI encoded URL that specifies the location for the signing widget to redirect the user to after it is signed. 
     #       Ex. "http://yoursite/thanks_for_signing"
@@ -267,7 +267,7 @@ module RightSignature
     #         {:name => 'sent_from_api'},
     #         {:name => 'user_id', :value => '32'}
     #       ],
-    #       :callback_url => "http://yoursite/callback"
+    #       :callback_location => "http://yoursite/callback"
     #     })
     def send_as_embedded_signers(guid, recipients, options={})
       redirect_location = options.delete(:redirect_location)

@@ -110,7 +110,7 @@ module RightSignature
     #   - <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
     #   - <b>tags</b>: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
     #     Ex. ['sent_from_api', {"user_id" => "32"}]
-    #   - <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   - <b>callback_location</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #     Ex. "http://yoursite/callback"
     #   - <b>use_text_tags</b>: Document has special Text Tags that RightSignature parse. true or false.
     #     More info: https://rightsignature.com/apidocs/text_tags
@@ -135,7 +135,7 @@ module RightSignature
     #   - <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
     #   - <b>tags</b>: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
     #       Ex. ['sent_from_api', {"user_id" => "32"}]
-    #   - <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   - <b>callback_location</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #       Ex. "http://yoursite/callback"
     #   - <b>use_text_tags</b>: Document has special Text Tags that RightSignature parse. true or false.
     #       More info: https://rightsignature.com/apidocs/text_tags
@@ -176,7 +176,7 @@ module RightSignature
     #   - <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
     #   - <b>tags</b>: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
     #       Ex. ['sent_from_api', {"user_id" => "32"}]
-    #   - <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   - <b>callback_location</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #       Ex. "http://yoursite/callback"
     #   - <b>use_text_tags</b>: Document has special Text Tags that RightSignature parse. true or false.
     #       More info: https://rightsignature.com/apidocs/text_tags
@@ -217,7 +217,7 @@ module RightSignature
     #   - <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
     #   - <b>tags</b>: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
     #       Ex. ['sent_from_api', {"user_id" => "32"}]
-    #   - <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   - <b>callback_location</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #       Ex. "http://yoursite/callback"
     #   - <b>use_text_tags</b>: Document has special Text Tags that RightSignature parse. true or false.
     #       More info: https://rightsignature.com/apidocs/text_tags
@@ -270,7 +270,7 @@ module RightSignature
     #   - <b>expires_in</b>: number of days before expiring the document. API only allows 2,5,15, or 30.
     #   - <b>tags</b>: document tags, an array of string or hashes 'single_tag' (for simple tag) or {'tag_name' => 'tag_value'} (for tuples pairs)
     #     Ex. ['sent_from_api', {"user_id" => "32"}]
-    #   - <b>callback_url</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
+    #   - <b>callback_location</b>: A URI encoded URL that specifies the location for API to POST a callback notification to when the document has been created and signed. 
     #     Ex. "http://yoursite/callback"
     #   - <b>use_text_tags</b>: Document has special Text Tags that RightSignature parse. true or false.
     #     More info: https://rightsignature.com/apidocs/text_tags
