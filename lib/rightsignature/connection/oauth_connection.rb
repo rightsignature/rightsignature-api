@@ -55,8 +55,9 @@ module RightSignature
     end
     
     # Uses consumer to generate a request token.
-    def new_request_token
-      @request_token = oauth_consumer.get_request_token
+    # * <b>o</b>: options hash. Use this to set the :oauth_callback
+    def new_request_token(o = {})
+      @request_token = oauth_consumer.get_request_token(o)
     end
 
     # Sets request token.
