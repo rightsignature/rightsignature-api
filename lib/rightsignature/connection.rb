@@ -203,7 +203,12 @@ module RightSignature
       else
         unless response.success?
           puts response.body
-          raise RightSignature::ResponseError.new(response)
+          msg = nil
+          begin
+            msg = MultiXml.parse(response.body)["error"]["message"]
+          rescue
+          end
+          raise RightSignature::ResponseError.new(response, msg)
         end
         
         response.parsed_response
