@@ -191,14 +191,24 @@ module RightSignature
       if response.is_a? Net::HTTPResponse
         unless response.is_a? Net::HTTPSuccess
           puts response.body
-          raise RightSignature::ResponseError.new(response)
+          msg = nil
+          begin
+            msg = MultiXml.parse(response.body)["error"]["message"]
+          rescue
+          end
+          raise RightSignature::ResponseError.new(response, msg)
         end
 
         MultiXml.parse(response.body)
       else
         unless response.success?
           puts response.body
-          raise RightSignature::ResponseError.new(response)
+          msg = nil
+          begin
+            msg = MultiXml.parse(response.body)["error"]["message"]
+          rescue
+          end
+          raise RightSignature::ResponseError.new(response, msg)
         end
         
         response.parsed_response
