@@ -75,6 +75,16 @@ describe RightSignature::OauthConnection do
       oauth_connection.new_request_token
       oauth_connection.request_token.should == request_mock
     end
+    
+    it "should pass in options" do
+      request_mock = mock(OAuth::RequestToken)
+      OAuth::Consumer.stub(:new).and_return(@consumer_mock)
+      @consumer_mock.should_receive(:get_request_token).with({:oauth_callback => "http://example.com/callback"}).and_return(request_mock)
+
+      oauth_connection = RightSignature::OauthConnection.new({:consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_token => "AccessToken098", :access_secret => "AccessSecret123"})
+      oauth_connection.new_request_token({:oauth_callback => "http://example.com/callback"})
+      oauth_connection.request_token.should == request_mock
+    end
   end
 
   describe "set_request_token" do
