@@ -61,7 +61,7 @@ module RightSignature
     #       Ex. "http://yoursite/callback"
     # 
     # Ex. call with all options used
-    #   RightSignature::Template.prefill(
+    #   @rs_connection.prefill(
     #     "a_1_zcfdidf8fi23", 
     #     "Your Employee Handbook", 
     #     [{"employee" => {:name => "John Employee", :email => "john@employee.com"}}],
@@ -125,7 +125,7 @@ module RightSignature
     #       Ex. "http://yoursite/callback"
     # 
     # Ex. call with all options used
-    #   RightSignature::Template.prepackage_and_send(
+    #   @rs_connection.prepackage_and_send(
     #     "a_1_zcfdidf8fi23", 
     #     "Your Employee Handbook", 
     #     [{"employee" => {:name => "John Employee", :email => "john@employee.com"}}],
@@ -173,7 +173,7 @@ module RightSignature
     #       Ex. "http://yoursite/callback"
     # 
     # Ex. call with all options used
-    #   RightSignature::Template.send_template(
+    #   @rs_connection.send_template(
     #     "a_1_zcfdidf8fi23", 
     #     "Your Employee Handbook", 
     #     [{"employee" => {:name => "John Employee", :email => "john@employee.com"}}],
@@ -252,7 +252,7 @@ module RightSignature
     #       Ex. "http://yoursite/thanks_for_signing"
     # 
     # Ex. call with all options used
-    #   RightSignature::Template.prefill(
+    #   @rs_connection.send_as_embedded_signers(
     #     "a_1_zcfdidf8fi23", 
     #     "Your Employee Handbook", 
     #     [{"employee" => {:name => "John Employee", :email => "john@employee.com"}}],
@@ -267,7 +267,7 @@ module RightSignature
     #         {:name => 'sent_from_api'},
     #         {:name => 'user_id', :value => '32'}
     #       ],
-    #       :callback_location => "http://yoursite/callback"
+    #       :redirect_location => "http://yoursite/redirect_from_signing"
     #     })
     def send_as_embedded_signers(guid, recipients, options={})
       redirect_location = options.delete(:redirect_location)
