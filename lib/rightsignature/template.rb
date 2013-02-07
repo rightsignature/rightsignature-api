@@ -76,6 +76,7 @@ module RightSignature
     #         {:name => 'sent_from_api'},
     #         {:name => 'user_id', :value => '32'}
     #       ],
+    #       :redirect_location => "http://yoursite/redirect",
     #       :callback_location => "http://yoursite/callback"
     #     })
     def prefill(guid, subject, roles, options={})
@@ -93,7 +94,7 @@ module RightSignature
       use_merge_field_ids = options.delete(:use_merge_field_ids)
       xml_hash[:template][:merge_fields] = MergeFieldsHelper.array_to_xml_hash(options[:merge_fields], use_merge_field_ids) if options[:merge_fields]
       xml_hash[:template][:tags] = TagsHelper.array_to_xml_hash(options[:tags]) if options[:tags]
-      [:expires_in, :description, :callback_location, :action].each do |other_option|
+      [:expires_in, :description, :callback_location, :redirect_location, :action].each do |other_option|
         xml_hash[:template][other_option] = options[other_option] if options[other_option]
       end
 

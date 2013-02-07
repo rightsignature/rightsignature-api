@@ -158,7 +158,7 @@ describe RightSignature::Template do
         @rs.prefill("MYGUID", "sign me", [], {:tags => [{"I_Key" => "I_Value"}, "Alone"]})
       end
 
-      it "should include options :expires_in, :description, and :callback_location" do
+      it "should include options :expires_in, :description, :redirect_location, and :callback_location" do
         @rs.should_receive(:post).with('/api/templates.xml', {
           :template => {
             :guid => "MYGUID", 
@@ -167,10 +167,11 @@ describe RightSignature::Template do
             :roles => [],
             :expires_in => 15, 
             :description => "Hey, I'm a description", 
+            :redirect_location => 'http://example.com/redirectme',
             :callback_location => 'http://example.com/callie'
           }
         })
-        @rs.prefill("MYGUID", "sign me", [], {:expires_in => 15, :description => "Hey, I'm a description", :callback_location => "http://example.com/callie"})
+        @rs.prefill("MYGUID", "sign me", [], {:expires_in => 15, :description => "Hey, I'm a description", :redirect_location => 'http://example.com/redirectme', :callback_location => "http://example.com/callie"})
       end
     end
 
