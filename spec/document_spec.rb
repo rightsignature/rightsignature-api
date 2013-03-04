@@ -280,6 +280,13 @@ describe RightSignature::Document do
       response.include?({"name" => "Righty Jones", "url" => "#{@rs.site}/signatures/embedded?rt=fdh89"}).should be_true
     end
 
+    it "should GET /api/documents/GUID123/signer_links.xml and return [] for no signers" do
+      @rs.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {}).and_return({'document' => {'signer_links' => nil}})
+      
+      response = @rs.get_document_signer_links_for("GUID123")
+      response.should == []
+    end
+
     it "should GET /api/documents/GUID123/signer_links.xml with URI encoded redirect location and return urls for 1 signer_link" do
       @rs.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {:redirect_location => "http://google.com/redirected%20location"}
       ).and_return({'document' => {'signer_links' => {'signer_link' => 

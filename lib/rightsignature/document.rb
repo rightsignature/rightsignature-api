@@ -311,11 +311,11 @@ module RightSignature
       
       signer_links = []
       
-      if response["document"]["signer_links"]["signer_link"].is_a? Array
+      if response["document"]["signer_links"] && response["document"]["signer_links"]["signer_link"].is_a?(Array)
         response["document"]["signer_links"]["signer_link"].each do |signer_link|
           signer_links << {"name" => signer_link["name"], "url" => "#{site}/signatures/embedded?rt=#{signer_link["signer_token"]}"}
         end
-      else
+      elsif response["document"]["signer_links"]
         signer_link = response["document"]["signer_links"]["signer_link"]
         signer_links << {"name" => signer_link["name"], "url" => "#{site}/signatures/embedded?rt=#{signer_link["signer_token"]}"}
       end
