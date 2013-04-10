@@ -15,6 +15,13 @@ describe RightSignature::Helpers::TagsHelper do
     it "should convert array of string and hash of {name => value} into array of :tag => {:name => name, :value => value}" do
       RightSignature::Helpers::TagsHelper.array_to_xml_hash(['abc', {"taggy" => "tvalue"}]).should == [{:tag => {:name => 'abc'}}, {:tag => {:name => 'taggy', :value => 'tvalue'}}]
     end
+    
+    it "should convert a symbol to a string for names and values" do
+      RightSignature::Helpers::TagsHelper.array_to_xml_hash([:abc, {:taggy => :tvalue}]).should == [
+        {:tag => {:name => 'abc'}}, 
+        {:tag => {:name => 'taggy', :value => 'tvalue'}}
+      ]
+    end
   end
 end
 
@@ -63,5 +70,16 @@ describe RightSignature::Helpers::MergeFieldsHelper do
       results.include?({:merge_field => {:value => "Santa Barbara", "@merge_field_id" => "1_abc_defg"}})
       results.include?({:merge_field => {:value => "House", "@merge_field_id" => "2_345_789"}})
     end
+    
+    it "should convert a symbol to a string for names and values" do
+      results = RightSignature::Helpers::MergeFieldsHelper.array_to_xml_hash([
+        {:abc_defg => :SomeValue},
+        {:higjk => "House"}
+      ], true)
+      results.size.should == 2
+      results.include?({:merge_field => {:value => "SomeValue", "@merge_field_id" => "abc_defg"}})
+      results.include?({:merge_field => {:value => "House", "@merge_field_id" => "higjk"}})
+    end
+
   end
 end

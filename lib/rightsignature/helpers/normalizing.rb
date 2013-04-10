@@ -22,9 +22,9 @@ module RightSignature::Helpers #:nodoc:
         tags_array.map do |t|
           if t.is_a? Hash
             name, value = t.first
-            {:tag => {:name => name, :value => value}}
+            {:tag => {:name => name.to_s, :value => value.to_s}}
           else
-            {:tag => {:name => t}}
+            {:tag => {:name => t.to_s}}
           end
         end
       end
@@ -43,9 +43,9 @@ module RightSignature::Helpers #:nodoc:
           name, value = role_hash.first
           raise "Hash '#{role_hash.inspect}' is malformed, should be something like {ROLE_NAME => {:name => \"a\", :email => \"a@a.com\"}}" unless value.is_a? Hash and name.is_a? String
           if name.match(/^signer_[A-Z]+$/) || name.match(/^cc_[A-Z]+$/)
-            roles_hash_array << {:role => value.merge({"@role_id" => name})}
+            roles_hash_array << {:role => value.merge({"@role_id" => name.to_s})}
           else
-            roles_hash_array << {:role => value.merge({"@role_name" => name})}
+            roles_hash_array << {:role => value.merge({"@role_name" => name.to_s})}
           end
         end
       
@@ -65,9 +65,9 @@ module RightSignature::Helpers #:nodoc:
         merge_fields_array.each do |merge_field_hash|
           name, value = merge_field_hash.first
           if use_id
-            merge_fields << { :merge_field => {:value => value, "@merge_field_id" => name}}
+            merge_fields << { :merge_field => {:value => value.to_s, "@merge_field_id" => name.to_s}}
           else
-            merge_fields << { :merge_field => {:value => value, "@merge_field_name" => name}}
+            merge_fields << { :merge_field => {:value => value.to_s, "@merge_field_name" => name.to_s}}
           end
         end
 
