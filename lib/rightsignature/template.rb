@@ -80,23 +80,20 @@ module RightSignature
     #       :callback_location => "http://yoursite/callback"
     #     })
     def prefill(guid, subject, roles, options={})
+      use_merge_field_ids = options.delete(:use_merge_field_ids)
       xml_hash = {
         :template => {
           :guid => guid,
           :action => "prefill",
           :subject => subject
-        }
+        }.merge(options)
       }
       
       xml_hash[:template][:roles] = RolesHelper.array_to_xml_hash(roles)
       
       # Optional arguments
-      use_merge_field_ids = options.delete(:use_merge_field_ids)
       xml_hash[:template][:merge_fields] = MergeFieldsHelper.array_to_xml_hash(options[:merge_fields], use_merge_field_ids) if options[:merge_fields]
       xml_hash[:template][:tags] = TagsHelper.array_to_xml_hash(options[:tags]) if options[:tags]
-      [:expires_in, :description, :callback_location, :redirect_location, :action, :document_data].each do |other_option|
-        xml_hash[:template][other_option] = options[other_option] if options[other_option]
-      end
 
       post "/api/templates.xml", xml_hash
     end
@@ -208,15 +205,11 @@ module RightSignature
     #       There will be no free-form name entry when adding merge fields to the Template.
     #       Ex. ["Location", "Tax ID", "Company Name"]
     def generate_build_url(options={})
-      xml_hash = {:template => {}}
+      xml_hash = {:template => options}     
       xml_hash[:template][:tags] = TagsHelper.array_to_xml_hash(options[:tags]) if options[:tags]
       
       [:acceptable_merge_field_names, :acceptable_role_names].each do |option|
         xml_hash[:template][option] = array_to_acceptable_names_hash(options[option]) if options[option]
-      end
-      
-      [:callback_location, :redirect_location].each do |other_option|
-        xml_hash[:template][other_option] = options[other_option] if options[other_option]
       end
 
       response = post "/api/templates/generate_build_token.xml", xml_hash

@@ -174,6 +174,30 @@ describe RightSignature::Template do
         })
         @rs.prefill("MYGUID", "sign me", [], {:expires_in => 15, :description => "Hey, I'm a description", :redirect_location => 'http://example.com/redirectme', :callback_location => "http://example.com/callie", :document_data => {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"}})
       end
+
+      it "should include extra options" do
+        @rs.should_receive(:post).with('/api/templates.xml', {
+          :template => {
+            :guid => "MYGUID", 
+            :action => "prefill",
+            :subject => "sign me", 
+            :roles => [
+              {:role => {
+                :name => "John Employee", 
+                :email => "john@employee.com", 
+                "@role_id" => "signer_A"
+            }}],
+            :expires_in => 15, 
+            :description => "Hey, I'm a description", 
+            :redirect_location => 'http://example.com/redirectme',
+            :document_data => {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"},
+            :callback_location => 'http://example.com/callie',
+            :something_else => "else",
+            :merge_fields => [{:merge_field => {:value => "123456", "@merge_field_id" => "123_abc_78"}}]
+          }
+        })
+        @rs.prefill("MYGUID", "sign me", [{"signer_A" => {:name => "John Employee", :email => "john@employee.com"}}], {:expires_in => 15, :description => "Hey, I'm a description", :redirect_location => 'http://example.com/redirectme', :callback_location => "http://example.com/callie", :document_data => {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"}, :merge_fields => [{"123_abc_78" => "123456"}], :use_merge_field_ids => true, :something_else => "else"})
+      end
     end
 
     it "should POST /api/templates.xml with action of 'send', MYGUID guid, roles, and \"sign me\" subject in template hash" do
@@ -234,6 +258,29 @@ describe RightSignature::Template do
         }}).and_return({"token"=>{"redirect_token" => "REDIRECT_TOKEN"}})
 
         @rs.generate_build_url(:callback_location => "http://example.com/done_signing", :redirect_location => "http://example.com/come_back_here")
+      end
+
+      it "should include other extra options in params" do
+        @rs.should_receive(:post).with("/api/templates/generate_build_token.xml", {:template => {
+          :tags => 
+            [
+              {:tag => {:name => "Site"}}
+            ],
+          :acceptable_merge_field_names => 
+            [
+              {:name => "Site ID"}, 
+              {:name => "Starting City"}
+            ],
+          :acceptable_role_names => 
+            [
+              {:name => "Http Party"}
+            ],
+          :callback_location => "http://example.com/done_signing", 
+          :redirect_location => "http://example.com/come_back_here",
+          :extras => "stuff here"
+        }}).and_return({"token"=>{"redirect_token" => "REDIRECT_TOKEN"}})
+
+        @rs.generate_build_url(:tags => ["Site"], :acceptable_merge_field_names => ["Site ID", "Starting City"], :acceptable_role_names => ["Http Party"], :callback_location => "http://example.com/done_signing", :redirect_location => "http://example.com/come_back_here", :extras => "stuff here")
       end
     end
   end
