@@ -414,13 +414,30 @@ request_hash= {
 @rs_connection.post('/api/documents.xml', request_hash, {'custom_header' => 'headerValue'})
 ```
 
+Getting API Error Messages
+--------------------------
+If a request does not return a success response (200), a RightSignature::ResponseError is raised. You can rescue the error and inspect the response object or call detailed_message. detailed_message only returns if the response from the server contains an error message in the XML.
+#####Ex. Trying to parse the error message response from API
+```
+begin
+  @rs_connection.post('/api/documents.xml', {:bad => 'params'})
+rescue RightSignature::ResponseError => error
+  puts error.detailed_message
+end
+```
+
+#####Ex. Trying to inspect the response object for more information
+```
+begin
+  @rs_connection.post('/api/documents.xml', {:bad => 'params'})
+rescue RightSignature::ResponseError => error
+  puts error.response.inspect
+end
+```
+
 Development Notes
 -----------------
 To load in irb from project root:
 ```
 $:.push File.expand_path("../lib", __FILE__); require "rightsignature"; RightSignature::Connection.new(MY_KEYS)
 ```
-
-TODO:
------
-* Parse error message from response body on unsuccessful requests

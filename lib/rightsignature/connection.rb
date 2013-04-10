@@ -190,14 +190,12 @@ module RightSignature
     def parse_response(response)
       if response.is_a? Net::HTTPResponse
         unless response.is_a? Net::HTTPSuccess
-          puts response.body
           raise RightSignature::ResponseError.new(response)
         end
 
         MultiXml.parse(response.body)
       else
         unless response.success?
-          puts response.body
           raise RightSignature::ResponseError.new(response)
         end
         

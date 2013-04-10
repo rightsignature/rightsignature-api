@@ -25,6 +25,22 @@ describe RightSignature::ResponseError do
         error.message.should == 'No Way'
       end
     end
+    
+    describe "detailed_message" do
+      it "should return error message from xml" do
+        response = Net::HTTPNotAcceptable.new('1.1', 406, 'Not Acceptable')
+        response.stub(:body).and_return('<error><message>Invalid GUID</message></error>')
+        error = RightSignature::ResponseError.new(response)
+        error.detailed_message.should == 'Invalid GUID'
+      end
+
+      it "should return nothing if response does not have error message node" do
+        response = Net::HTTPNotFound.new('1.1', 404, 'Not Found')
+        response.stub(:body).and_return('<html><body>Not Found</body></html>')
+        error = RightSignature::ResponseError.new(response)
+        error.detailed_message.should be_nil
+      end
+    end
 
     describe "common_solutions" do
       describe "on 406" do
@@ -79,6 +95,24 @@ describe RightSignature::ResponseError do
       it "should return specified message" do
         error = RightSignature::ResponseError.new(@response, "No Way")
         error.message.should == 'No Way'
+      end
+    end
+
+    describe "detailed_message" do
+      it "should return error message from xml" do
+        net_http_response = Net::HTTPNotAcceptable.new('1.1', 406, 'Not Acceptable')
+        net_http_response.stub(:body).and_return('<error><message>Invalid GUID</message></error>')
+        response = HTTParty::Response.new(HTTParty::Request.new(Net::HTTP::Get, '/'), net_http_response, lambda{{"error" => {"message" => "Invalid GUID"}}})
+        error = RightSignature::ResponseError.new(response)
+        error.detailed_message.should == 'Invalid GUID'
+      end
+
+      it "should return nothing if response does not have error message node" do
+        net_http_response = Net::HTTPNotFound.new('1.1', 404, 'Not Found')
+        net_http_response.stub(:body).and_return('<html><body>Not Found</body></html>')
+        response = HTTParty::Response.new(HTTParty::Request.new(Net::HTTP::Get, '/'), net_http_response, lambda{ {}})
+        error = RightSignature::ResponseError.new(response)
+        error.detailed_message.should be_nil
       end
     end
 
