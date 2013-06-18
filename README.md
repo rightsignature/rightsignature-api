@@ -128,7 +128,7 @@ Optional Options:
 
 #####Extend Expiration of Document by 7 days
 ```
-@rs_connection.extend_expiration(guid)
+@rs_connection.extend_document_expiration(guid)
 ```
 
 #####Replace Tags on Document
