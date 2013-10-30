@@ -10,4 +10,4 @@ require 'rightsignature/connection/oauth_connection'
 require 'rightsignature/connection/token_connection'
 require 'rightsignature/connection'
 
-XmlFu::Node.symbol_conversion_algorithm = :none
+XmlFu.config.symbol_conversion_algorithm = :none
