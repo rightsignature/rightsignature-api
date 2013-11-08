@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/rightsignature/rightsignature-api"
   s.summary     = "API wrapper for RightSignature"
   s.description = "Provides a wrapper for the RightSignature API."
+  s.license     = 'MIT'
 
   s.add_development_dependency "bundler", ">= 1.0.0"
   s.add_development_dependency "rspec", ">= 2.11.0"
