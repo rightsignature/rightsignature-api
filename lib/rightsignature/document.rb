@@ -297,13 +297,14 @@ module RightSignature
       "#{site}/builder/new?rt=#{response['document']['redirect_token']}"
     end
     
-    # Generates signer links for a Document with signers with email of "noemail@rightsignautre.com"
+    # Generates signer links for a Document with signers with email of "noemail@rightsignature.com"
     # * <b>guid</b>: Document GUID
     # * <b>redirect_location</b>: (Optional) URL to redirect each signer after it is completed
     # 
     # Ex. Generate signer links for document GUID123 that redirects users to http://mysite/done_signing after signing
     #   @rs_connection.get_document_signer_links_for("GUID123", "http://mysite/done_signing")
     # 
+    # Note that ONLY recipients with an email of "noemail@rightsignature.com" will have a signer link
     def get_document_signer_links_for(guid, redirect_location = nil)
       params = {}
       params[:redirect_location] = URI.encode(redirect_location) if redirect_location
