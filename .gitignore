@@ -3,5 +3,6 @@
 .rvmrc
 *.swp
 *.swo
+*.gem
 Gemfile.lock
 pkg
