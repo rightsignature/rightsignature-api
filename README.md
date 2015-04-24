@@ -34,7 +34,7 @@ Note: if the both OAuth credentials and api_token are set, the default action is
 #####Getting Access Token
 Make sure you have a server that is can recieve the parameters from RightSignature and the callback is setup correctly in the RightSignature API settings (https://rightsignature.com/oauth_clients).
 ```
-request_token = @rs_connection.new_request_token
+request_token = @rs_connection.oauth_connection.new_request_token
 ```
 
 Now Visit the url generated from
