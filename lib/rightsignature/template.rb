@@ -248,7 +248,6 @@ module RightSignature
     # Ex. call with all options used
     #   @rs_connection.send_as_embedded_signers(
     #     "a_1_zcfdidf8fi23", 
-    #     "Your Employee Handbook", 
     #     [{"employee" => {:name => "John Employee", :email => "john@employee.com"}}],
     #     {
     #       :description => "Please read over the handbook and sign it.",
