@@ -21,5 +21,11 @@ describe "RightSignature::RailsStyle" do
 
       @rs.prepackage_and_send("GUID123", [], {"subject" => "sign me"})
     end
+
+    it 'escapes tags' do
+      @rs.should_receive(:get).with('/api/templates.xml', {tags: "hel%2Clo,the%22re,key:val%3Aue"})
+      @rs.templates_list(tags: ["hel,lo", "the\"re",{key: "val:ue"}])
+    end
+
   end
 end
