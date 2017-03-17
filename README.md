@@ -357,13 +357,13 @@ You can also add restrictions to what the person can do:
 options = {
   :acceptable_merge_field_names =>
     [
-      {:name => "Site ID"},
-      {:name => "Starting City"}
+      "Site ID",
+      "Starting City"
     ],
   :acceptable_role_names =>
     [
-      {:name => "Http Monster"},
-      {:name => "Party Monster"}
+      "Http Monster",
+      "Party Monster"
     ],
   :callback_location => "http://example.com/done_signing",
   :redirect_location => "http://example.com/come_back_here"

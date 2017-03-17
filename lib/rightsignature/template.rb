@@ -305,6 +305,14 @@ module RightSignature
       get_document_signer_links_for(document_guid, redirect_location)
     end
 
-
+    # Deletes a template
+    # * <b>guid</b>: Document GUID
+    #
+    # Ex. Delete template GUID123
+    #   @rs_connection.trash_template("GUID123")
+    #
+    def trash_template(guid)
+      delete "/api/templates/#{guid}.xml"
+    end
   end
 end

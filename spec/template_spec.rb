@@ -397,4 +397,12 @@ describe RightSignature::Template do
     
     it "should pass in options"
   end
+
+  describe "trash" do
+    it "should DELETE /api/templates/MYGUID.xml" do
+      expect(@rs).to receive(:delete).with('/api/templates/MYGUID.xml')
+      @rs.trash_template('MYGUID')
+    end
+  end
+
 end
