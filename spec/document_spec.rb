@@ -6,7 +6,7 @@ describe RightSignature::Document do
       @rs.should_receive(:get).with('/api/documents.xml', {})
       @rs.documents_list
     end
-    
+
     it "should pass search options to /api/templates.xml" do
       @rs.should_receive(:get).with('/api/documents.xml', {:search => "search", :page => 2})
       @rs.documents_list(:search => "search", :page => 2)
@@ -22,14 +22,14 @@ describe RightSignature::Document do
       @rs.documents_list(:state => ['pending', 'trashed'])
     end
   end
-  
+
   describe "details" do
     it "should GET /api/documentsMYGUID.xml" do
       @rs.should_receive(:get).with('/api/documents/MYGUID.xml')
       @rs.document_details('MYGUID')
     end
   end
-  
+
   describe "details" do
     it "should GET /api/documentsMYGUID.xml" do
       @rs.should_receive(:get).with('/api/documents/MYGUID.xml')
@@ -50,21 +50,21 @@ describe RightSignature::Document do
       @rs.send_reminder('MYGUID')
     end
   end
-  
+
   describe "trash" do
     it "should POST /api/documents/MYGUID/trash.xml" do
       @rs.should_receive(:post).with('/api/documents/MYGUID/trash.xml', {})
       @rs.trash_document('MYGUID')
     end
   end
-  
+
   describe "extend_document_expiration" do
     it "should POST /api/documents/MYGUID/extend_expiration.xml" do
       @rs.should_receive(:post).with('/api/documents/MYGUID/extend_expiration.xml', {})
       @rs.extend_document_expiration('MYGUID')
     end
   end
-  
+
   describe "update_document_tags" do
     it "should POST /api/documents/MYGUID/update_tags.xml" do
       @rs.should_receive(:post).with('/api/documents/MYGUID/update_tags.xml', {:tags => []})
@@ -134,7 +134,7 @@ describe RightSignature::Document do
       })
       document_data = {:type => 'base64', :filename => "originalfile.pdf", :value => "mOio90cv"}
       recipients = [{:name => "Signy Sign", :email => "signy@example.com", :role => "signer"}, {:name => "Cee Cee", :email => "ccme@example.com", :role => "cc"}]
-    
+
       options = {
         :description => "My descript",
         :callback_url => "http://example.com/call"
@@ -142,7 +142,7 @@ describe RightSignature::Document do
       @rs.send_document("subby", recipients, document_data, options)
     end
   end
-  
+
   describe "send_document_from_data" do
     it "should POST /api/documents.xml with document hash containing given subject, Base64 encoded version of document data, recipients, and action of 'send'" do
       @rs.should_receive(:post).with("/api/documents.xml", {
@@ -179,7 +179,7 @@ describe RightSignature::Document do
       @rs.send_document_from_data("THIS", "uploaded.pdf", "subby", recipients, options)
     end
   end
-  
+
   describe "send_document_from_file" do
     it "should open File and base64 encode it" do
       # Probably get a fixture or something here
@@ -239,7 +239,7 @@ describe RightSignature::Document do
       @rs.send_document_from_file(file_path, "subby", recipients, options)
     end
   end
-  
+
   describe "generate_document_url" do
     it "should POST /api/documents.xml with redirect action and return https://rightsignature.com/builder/new?rt=REDIRECT_TOKEN" do
       @rs.should_receive(:post).with("/api/documents.xml", {
@@ -253,49 +253,49 @@ describe RightSignature::Document do
       @rs.generate_document_redirect_url("subjy", [], {}).should == "#{@rs.site}/builder/new?rt=REDIRECT_TOKEN"
     end
   end
-  
+
   describe "get_document_signer_links_for" do
     it "should GET /api/documents/GUID123/signer_links.xml and return urls for signers" do
       @rs.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {}).and_return({'document' => {'signer_links' => {'signer_link' => [
-        {"signer_token" => "avx37", "name" => "John Bellingham"}, 
+        {"signer_token" => "avx37", "name" => "John Bellingham"},
         {"signer_token" => "fdh89", "name" => "Righty Jones"}]
       }}})
-      
+
       response = @rs.get_document_signer_links_for("GUID123")
       response.size.should == 2
-      response.include?({"name" => "John Bellingham", "url" => "#{@rs.site}/signatures/embedded?rt=avx37"}).should be_true
-      response.include?({"name" => "Righty Jones", "url" => "#{@rs.site}/signatures/embedded?rt=fdh89"}).should be_true
+      response.include?({"name" => "John Bellingham", "url" => "#{@rs.site}/signatures/embedded?rt=avx37"}).should be true
+      response.include?({"name" => "Righty Jones", "url" => "#{@rs.site}/signatures/embedded?rt=fdh89"}).should be true
     end
 
     it "should GET /api/documents/GUID123/signer_links.xml with URI encoded redirect location and return urls for signers" do
       @rs.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {:redirect_location => "http://google.com/redirected%20location"}
       ).and_return({'document' => {'signer_links' => {'signer_link' => [
-        {"signer_token" => "avx37", "name" => "John Bellingham"}, 
+        {"signer_token" => "avx37", "name" => "John Bellingham"},
         {"signer_token" => "fdh89", "name" => "Righty Jones"}]
       }}})
-      
+
       response = @rs.get_document_signer_links_for("GUID123", "http://google.com/redirected location")
       response.size.should == 2
-      response.include?({"name" => "John Bellingham", "url" => "#{@rs.site}/signatures/embedded?rt=avx37"}).should be_true
-      response.include?({"name" => "Righty Jones", "url" => "#{@rs.site}/signatures/embedded?rt=fdh89"}).should be_true
+      response.include?({"name" => "John Bellingham", "url" => "#{@rs.site}/signatures/embedded?rt=avx37"}).should be true
+      response.include?({"name" => "Righty Jones", "url" => "#{@rs.site}/signatures/embedded?rt=fdh89"}).should be true
     end
 
     it "should GET /api/documents/GUID123/signer_links.xml and return [] for no signers" do
       @rs.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {}).and_return({'document' => {'signer_links' => nil}})
-      
+
       response = @rs.get_document_signer_links_for("GUID123")
       response.should == []
     end
 
     it "should GET /api/documents/GUID123/signer_links.xml with URI encoded redirect location and return urls for 1 signer_link" do
       @rs.should_receive(:get).with("/api/documents/GUID123/signer_links.xml", {:redirect_location => "http://google.com/redirected%20location"}
-      ).and_return({'document' => {'signer_links' => {'signer_link' => 
+      ).and_return({'document' => {'signer_links' => {'signer_link' =>
         {"signer_token" => "fdh89", "name" => "Righty Jones"}
       }}})
-      
+
       response = @rs.get_document_signer_links_for("GUID123", "http://google.com/redirected location")
       response.size.should == 1
-      response.include?({"name" => "Righty Jones", "url" => "#{@rs.site}/signatures/embedded?rt=fdh89"}).should be_true
+      response.include?({"name" => "Righty Jones", "url" => "#{@rs.site}/signatures/embedded?rt=fdh89"}).should be true
     end
   end
 end

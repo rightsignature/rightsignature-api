@@ -4,7 +4,10 @@ describe RightSignature::Connection do
   before do
     @net_http_response = Net::HTTPOK.new('1.1', 200, 'OK')
     @net_http_response.stub(:body => '')
-    @httparty_response = stub("HTTPartyResponse", :parsed_response => nil, :body => '', :success? => true)
+
+    @httparty_response = stub("HTTPartyResponse", :body => '')
+    @httparty_response.stub(:parsed_response) {nil}
+    @httparty_response.stub(:success?) {true}
   end
 
   describe "GET" do
@@ -27,12 +30,12 @@ describe RightSignature::Connection do
         @rs.get("/path")
       end
     end
-    
+
     it "should raise error if no configuration is set" do
       @rs = RightSignature::Connection.new({})
       lambda{@rs.get("/path")}.should raise_error
     end
-    
+
     describe "using OauthConnection" do
       it "should append params into path alphabetically and URI escaped" do
         @rs = RightSignature::Connection.new({:consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_token => "AccessToken098", :access_secret => "AccessSecret123"})
@@ -97,7 +100,7 @@ describe RightSignature::Connection do
       end
     end
 
-    
+
     describe "DELETE" do
       describe "connection method" do
         it "should default to RightSignature::57 if no api_token was specified" do
@@ -216,6 +219,6 @@ describe RightSignature::Connection do
         end
       end
     end
-    
+
   end
 end
