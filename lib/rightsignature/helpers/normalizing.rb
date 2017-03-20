@@ -1,3 +1,4 @@
+require 'pry'
 module RightSignature::Helpers #:nodoc:
   module TagsHelper #:nodoc:
     class <<self #:nodoc:
@@ -17,6 +18,35 @@ module RightSignature::Helpers #:nodoc:
           }
 
         tags_array.join ','
+      end
+
+      def tags_array_from_tags_string tags_string
+        tags_string ||= ""
+
+        if ! tags_string.is_a? String
+          return raise ArgumentError, "Object must be a string"
+        end
+
+        tags_string.split(',')
+          .select{|t| t !~ /:/}
+          .collect{|t| CGI.unescape(t)}
+      end
+
+      def metadata_hash_from_tags_string tags_string
+        tags_string ||= ""
+
+        if ! tags_string.is_a? String
+          return raise ArgumentError, "Object must be a string"
+        end
+
+        Hash[
+          tags_string.split(',')
+            .select{ |t| t =~ /:/}
+            .collect{ |t|
+              md = t.split(':')
+              [CGI.unescape(md[0]), CGI.unescape(md[1])]
+            }
+        ]
       end
 
       def mixed_array_to_string_array(array_of_tags)
@@ -59,7 +89,7 @@ module RightSignature::Helpers #:nodoc:
         roles_hash_array = []
         roles_array.each do |role_hash|
           name, value = role_hash.first
-          raise "Hash '#{role_hash.inspect}' is malformed, should be something like {ROLE_NAME => {:name => \"a\", :email => \"a@a.com\"}}" unless value.is_a? Hash and name.is_a? String
+          raise "Hash '#{role_hash.inspect}' is malformed, should be something like {ROLE_NAME => {:name => \"a\", :email => \"a@a.com\"}}" unless value.is_a? Hash and (name.is_a? String or name.is_a? Symbol)
           if name.match(/^signer_[A-Z]+$/) || name.match(/^cc_[A-Z]+$/)
             roles_hash_array << {:role => value.merge({"@role_id" => name.to_s})}
           else

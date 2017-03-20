@@ -1,3 +1,5 @@
+using RefineHashToIndifferentAccess
+
 module RightSignature
   module Document
     include RightSignature::Helpers
