@@ -45,7 +45,11 @@ module RightSignature
     #   }
     #   @rs_connection.templates_list(options)
     def templates_list(options={})
-      options[:tags] = TagsHelper.mixed_array_to_string_array(options[:tags]) if options[:tags]
+      if options[:metadata]
+        options[:tags] = TagsHelper.array_and_metadata_to_string_array(options[:tags], options.delete(:metadata))
+      elsif options[:tags]
+        options[:tags] = TagsHelper.mixed_array_to_string_array(options[:tags])
+      end
       get "/api/templates.xml", options
     end
 

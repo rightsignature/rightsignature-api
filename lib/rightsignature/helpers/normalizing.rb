@@ -1,6 +1,24 @@
 module RightSignature::Helpers #:nodoc:
   module TagsHelper #:nodoc:
     class <<self #:nodoc:
+      def array_and_metadata_to_string_array(array_of_tags, hash_of_metadata)
+        array_of_tags ||= []
+        hash_of_metadata ||= {}
+        if !(array_of_tags.is_a?(Array) && hash_of_metadata.is_a?(Hash))
+          return raise ArgumentError, "Objects must be an array and a hash"
+        end
+
+        tags_array =
+          array_of_tags.collect{|t| CGI.escape(t)} +
+          hash_of_metadata.collect{ |k,v|
+            "#{CGI.escape(k.to_s)}:#{CGI.escape(v.to_s)}" if ! v.to_s.strip.empty?
+          }.select{ |t|
+            ! t.to_s.strip.empty?
+          }
+
+        tags_array.join ','
+      end
+
       def mixed_array_to_string_array(array_of_tags)
         return array_of_tags unless array_of_tags.is_a?(Array)
 

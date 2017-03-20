@@ -27,5 +27,20 @@ describe "RightSignature::RailsStyle" do
       @rs.templates_list(tags: ["hel,lo", "the\"re",{key: "val:ue"}])
     end
 
+    it 'can accept metadata and tags' do
+      @rs.should_receive(:get).with('/api/templates.xml', {tags: "hello,there,abc:def"})
+      @rs.templates_list(
+        tags: ["hello", "there"],
+        metadata: {"abc" => "def"},
+      )
+    end
+
+    it 'escapes metadata and tags' do
+      @rs.should_receive(:get).with('/api/templates.xml', {tags: "hel%2Clo,the%22re,abc:de%3Af"})
+      @rs.templates_list(
+        tags: ["hel,lo", "the\"re"],
+        metadata: {"abc" => "de:f"},
+      )
+    end
   end
 end
