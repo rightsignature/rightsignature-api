@@ -90,8 +90,60 @@ describe RightSignature::RailsStyle do
          pdf_url:         "https%3A%2F%2Fs3.amazonaws.com%2Fdocs.rightsignature.com%2Fassets%2F22177095%2FMyFilename.pdf%3FAWSAccessKeyId%3DKEY%26Expires%3D#{@time.to_i}%26Signature%3DSOMESIG",
          thumbnail_url:   "https%3A%2F%2Fs3.amazonaws.com%2Fdocs.rightsignature.com%2Fassets%2F22177095%2Fa_Some_Id_s_p1_t.png%3FAWSAccessKeyId%3DKEY%26Expires%3D#{@time.to_i}%26Signature%3DSOMESIG",
          large_url:       "https%3A%2F%2Fs3.amazonaws.com%2Fdocs.rightsignature.com%2Fassets%2F22177095%2Fa_Some_id_s_p1.png%3FAWSAccessKeyId%3DKEY%26Expires%3D#{@time.to_i}%26Signature%3DSOMESIG",
-         signed_pdf_url:  "https%3A%2F%2Fs3.amazonaws.com%2Fdocs.rightsignature.com%2Fassets%2F22177095%2FMyFilename-signed.pdf%3FAWSAccessKeyId%3DKEY%26Expires%3D#{@time.to_i}%26Signature%3DSOMESIG"
-    }}
+         signed_pdf_url:  "https%3A%2F%2Fs3.amazonaws.com%2Fdocs.rightsignature.com%2Fassets%2F22177095%2FMyFilename-signed.pdf%3FAWSAccessKeyId%3DKEY%26Expires%3D#{@time.to_i}%26Signature%3DSOMESIG",
+      }}
+
+      @template_details = {
+       template:  {
+         type: "Document",
+         guid: "MYGUID",
+         created_at: "2017-03-03T09:24:18-08:00",
+         filename: "fw8ben.pdf",
+         size: "69211",
+         content_type: "pdf",
+         page_count: "1",
+         subject: "W-8BEN Tax Form",
+         message: "Please sign this document.",
+         tags: "hel%2Clo,the%22re,abc:de%3Af",
+         processing_state: "done-processing",
+         roles:  {
+           role:  [
+              { role: "Document Sender",
+                name: "Document Sender",
+                must_sign: "false",
+                document_role_id: "cc_A",
+                is_sender: "true"
+              },
+              { role: "Non-US Person",
+                name: "Non-US Person",
+                must_sign: "true",
+                document_role_id: "signer_A",
+                is_sender: "false"
+              }
+            ]
+          },
+         merge_fields: {
+           merge_field: [
+           {id: "a_21470713_efe491a03af24760b457ea0c12061d55_512294075",
+            name: "Effective Date",
+            page: "1",
+            value: nil
+           },
+           {id: "a_21470713_efe491a03af24760b457ea0c12061d55_512294076",
+            name: "Content URL",
+            page: "1",
+            value: nil
+           },
+         ]},
+         pages:  {
+           page:  {
+             page_number: "1",
+             original_template_guid: "a_22168482_df3f2b8fc9894d779d1f07c2d398ce70",
+             original_template_filename: "fw8ben.pdf"
+          }},
+         thumbnail_url: "https%3A%2F%2Fs3.amazonaws.com%2Fdocs.rightsignature.com%2Fassets%2F22168482%2Fa_Some_Id_p1_t.png%3FAWSAccessKeyId%3DKey%26Expires%3D#{@time.to_i}%26Signature%3DSomeSig",
+      }}
+
     end
 
     it 'can accept strings or symbols for options' do
@@ -207,13 +259,34 @@ describe RightSignature::RailsStyle do
         })
     end
 
+    it 'should format template details' do
+      @rs = RightSignature::RailsStyle.new({:consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_token => "AccessToken098", :access_secret => "AccessSecret123", :api_token => "APITOKEN"})
+
+      @rs.should_receive(:get).with('/api/templates/MYGUID.xml', {}).and_return(@template_details)
+
+      @doc = @rs.template_details('MYGUID')
+
+      expect(@doc).to include(
+        metadata: {"abc" => "de:f"},
+        tags: ["hel,lo", "the\"re"],
+        roles: include(
+          "cc_A" => include(document_role_id: "cc_A"),
+          "signer_A" => include(document_role_id: "signer_A"),
+        ),
+        merge_fields: include(
+          "Effective Date" => include(name: "Effective Date"),
+          "Content URL" => include(name: "Content URL")
+        ),
+        original_template_guid: "a_22168482_df3f2b8fc9894d779d1f07c2d398ce70",
+        original_template_filename: "fw8ben.pdf",
+      )
+    end
+
     it 'should format document details' do
       @rs = RightSignature::RailsStyle.new({:consumer_key => "Consumer123", :consumer_secret => "Secret098", :access_token => "AccessToken098", :access_secret => "AccessSecret123", :api_token => "APITOKEN"})
 
       @rs.should_receive(:get).with('/api/documents/MYGUID.xml').and_return(@document_details)
       @doc = @rs.document_details('MYGUID')
-
-      expect({a: {b: :c, e: :f}}).to include(a: include({b: :c}))
 
       # Only measuring the things that are different from normal document_details
       expect(@doc).to include(
