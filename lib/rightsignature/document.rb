@@ -197,7 +197,7 @@ module RightSignature
     #   @rs_connection.send_document_from_url("http://myfile/here", 'My Subject', recipients, options)
     #
     def send_document_from_url(url, subject, recipients, options={})
-      send_document(subject, recipients, {:type => "url", :filename => File.basename(url), :value => url }, options)
+      send_document(subject, recipients, {:type => "url", :filename => (options[:filename] or File.basename(url)), :value => url }, options)
     end
     
     # Creates a document from a base64 encoded file or publicly available URL
