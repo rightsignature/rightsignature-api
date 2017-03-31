@@ -270,12 +270,12 @@ describe RightSignature::RailsStyle do
         metadata: {"abc" => "de:f"},
         tags: ["hel,lo", "the\"re"],
         roles: include(
-          "cc_A" => include(document_role_id: "cc_A"),
-          "signer_A" => include(document_role_id: "signer_A"),
+          cc_A: include(document_role_id: "cc_A"),
+          signer_A: include(document_role_id: "signer_A"),
         ),
         merge_fields: include(
-          "Effective Date" => include(name: "Effective Date"),
-          "Content URL" => include(name: "Content URL")
+          "Effective Date".to_sym => include(name: "Effective Date"),
+          "Content URL".to_sym => include(name: "Content URL")
         ),
         original_template_guid: "a_22168482_df3f2b8fc9894d779d1f07c2d398ce70",
         original_template_filename: "fw8ben.pdf",
@@ -296,21 +296,21 @@ describe RightSignature::RailsStyle do
         original_template_guid: "a_Template_GUID",
         original_template_filename: "MyFilename.pdf",
         recipients: include(
-          "signer_A" => include(
+          signer_A: include(
             name: "Jack Employee",
           ),
-          "cc_A" => include(
+          cc_A: include(
             name: "Jill Employee",
           ),
         ),
         audit_trails: include(
-          (@time+0).strftime("%Y-%m-%dT%H:%M:%S%:z") => include(
+          (@time+0).strftime("%Y-%m-%dT%H:%M:%S%:z").to_sym => include(
             keyword: "created",
           ),
-          (@time+1).strftime("%Y-%m-%dT%H:%M:%S%:z") => include(
+          (@time+1).strftime("%Y-%m-%dT%H:%M:%S%:z").to_sym => include(
             keyword: "viewed",
           ),
-          (@time+2).strftime("%Y-%m-%dT%H:%M:%S%:z") => include(
+          (@time+2).strftime("%Y-%m-%dT%H:%M:%S%:z").to_sym => include(
             keyword: "signed",
           ),
           (@time+3).strftime("%Y-%m-%dT%H:%M:%S%:z") => include(
@@ -318,10 +318,10 @@ describe RightSignature::RailsStyle do
           ),
         ),
         form_fields: include(
-          "Form Field A" => include(
+          "Form Field A".to_sym => include(
             value: "Some Value A",
           ),
-          "Form Field B" => include(
+          "Form Field B".to_sym => include(
             value: "Some Value B"
           ),
         ),
