@@ -3,12 +3,12 @@ $:.push File.expand_path("../lib", __FILE__)
 require "rightsignature/version"
 
 Gem::Specification.new do |s|
-  s.name        = "rightsignature"
+  s.name        = "rightsignature-railstyle"
   s.version     = RightSignature::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Alex Chee", "Geoff Ereth", "Cary Dunn"]
-  s.email       = ["dev@rightsignature.com"]
-  s.homepage    = "http://github.com/rightsignature/rightsignature-api"
+  s.authors     = ["Nick Barone"]
+  s.email       = [""]
+  s.homepage    = "http://github.com/narfanator/rightsignature-api"
   s.summary     = "API wrapper for RightSignature"
   s.description = "Provides a wrapper for the RightSignature API."
   s.license     = 'MIT'
