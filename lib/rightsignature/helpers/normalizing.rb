@@ -1,4 +1,3 @@
-require 'pry'
 module RightSignature::Helpers #:nodoc:
   module TagsHelper #:nodoc:
     class <<self #:nodoc:

@@ -66,10 +66,10 @@ module RightSignature
       tmp = doc[:recipients] && (doc[:recipients][:recipient].is_a?(Hash) ? [doc[:recipients][:recipient]] : doc[:recipients][:recipient])
       doc[:recipients] = tmp.reduce({}){|h, v| h[v[:role_id]] = v and h} if tmp
 
-      tmp = doc[:audit_trails] && doc[:audit_trails][:audit_trail].is_a?(Hash) ? [doc[:audit_trails][:audit_trail]] : doc[:audit_trails][:audit_trail]
+      tmp = doc[:audit_trails] && (doc[:audit_trails][:audit_trail].is_a?(Hash) ? [doc[:audit_trails][:audit_trail]] : doc[:audit_trails][:audit_trail])
       doc[:audit_trails] = tmp.reduce({}){|h, v| h[v[:timestamp]] = v and h} if tmp
 
-      tmp = doc[:form_fields] && doc[:form_fields][:form_field].is_a?(Hash) ? [doc[:form_fields][:form_field]] : doc[:form_fields][:form_field]
+      tmp = doc[:form_fields] && (doc[:form_fields][:form_field].is_a?(Hash) ? [doc[:form_fields][:form_field]] : doc[:form_fields][:form_field])
       doc[:form_fields] = tmp.reduce({}){|h, v| h[v[:name]] = v and h} if tmp
 
       # Extract a few fields from a deeply nested array
@@ -82,7 +82,7 @@ module RightSignature
       doc.delete(:pages)
 
       %i(original_url pdf_url thumbnail_url large_url signed_pdf_url).each do |sym|
-        doc[sym] = CGI.unescape doc[sym]
+        doc[sym] = CGI.unescape doc[sym] if doc[sym]
       end
 
       doc
