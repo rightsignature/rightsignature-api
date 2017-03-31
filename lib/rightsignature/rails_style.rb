@@ -63,19 +63,21 @@ module RightSignature
       # Note: Must check if it's a deeply nested hash instead, since that is what occurs
       #  for single-item XLM "arrays"
       # {..., recipients: {recipient: [{...},{...}]}} => {..., recipients: {...: {...}, ...:{...}}}
-      tmp = doc[:recipients][:recipient].is_a?(Hash) ? [doc[:recipients][:recipient]] : doc[:recipients][:recipient]
-      doc[:recipients] = tmp.reduce({}){|h, v| h[v[:role_id]] = v and h}
+      tmp = doc[:recipients] && (doc[:recipients][:recipient].is_a?(Hash) ? [doc[:recipients][:recipient]] : doc[:recipients][:recipient])
+      doc[:recipients] = tmp.reduce({}){|h, v| h[v[:role_id]] = v and h} if tmp
 
-      tmp = doc[:audit_trails][:audit_trail].is_a?(Hash) ? [doc[:audit_trails][:audit_trail]] : doc[:audit_trails][:audit_trail]
-      doc[:audit_trails] = tmp.reduce({}){|h, v| h[v[:timestamp]] = v and h}
+      tmp = doc[:audit_trails] && doc[:audit_trails][:audit_trail].is_a?(Hash) ? [doc[:audit_trails][:audit_trail]] : doc[:audit_trails][:audit_trail]
+      doc[:audit_trails] = tmp.reduce({}){|h, v| h[v[:timestamp]] = v and h} if tmp
 
-      tmp = doc[:form_fields][:form_field].is_a?(Hash) ? [doc[:form_fields][:form_field]] : doc[:form_fields][:form_field]
-      doc[:form_fields] = tmp.reduce({}){|h, v| h[v[:name]] = v and h}
+      tmp = doc[:form_fields] && doc[:form_fields][:form_field].is_a?(Hash) ? [doc[:form_fields][:form_field]] : doc[:form_fields][:form_field]
+      doc[:form_fields] = tmp.reduce({}){|h, v| h[v[:name]] = v and h} if tmp
 
       # Extract a few fields from a deeply nested array
-      tmp = doc[:pages][:page].is_a?(Hash) ? doc[:pages][:page] : doc[:pages][:page].first
-      %i(original_template_guid original_template_filename).each do |sym|
-        doc[sym] = tmp[sym]
+      tmp = doc[:pages] && doc[:pages][:page].is_a?(Hash) ? doc[:pages][:page] : doc[:pages][:page].first
+      if tmp
+        %i(original_template_guid original_template_filename).each do |sym|
+          doc[sym] = tmp[sym]
+        end
       end
       doc.delete(:pages)
 
